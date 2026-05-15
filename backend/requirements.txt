@@ -1,0 +1,25 @@
+# JPJ Traffic & Walkability AI Advisor — backend dependencies
+# Install with: pip install -r requirements.txt
+
+# Web framework
+fastapi==0.136.1
+uvicorn==0.46.0
+python-multipart==0.0.28
+
+# Data validation
+pydantic==2.13.4
+pydantic-settings==2.14.1
+
+# AI / AWS
+strands-agents==1.39.0
+boto3==1.43.7
+
+# PDF generation
+reportlab==4.5.1
+pillow==12.2.0
+
+# Input sanitization
+bleach==6.3.0
+
+# Utilities
+python-dotenv==1.2.2
