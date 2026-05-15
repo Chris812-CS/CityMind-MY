@@ -404,42 +404,47 @@ function GanttChart({ analysis, editedRecs }: { analysis: AnalysisResponse; edit
   });
 
   return (
-    <Card>
+    <Card style={{ minWidth: 0, overflow: "hidden" }}>
       <SectionTitle>Implementation Timeline / Jadual Pelaksanaan (Month-Based)</SectionTitle>
 
-      {/* Scrollable container — never overflows */}
-      <div style={{ overflowX: "auto", width: "100%" }}>
+      {/* Scrollable container — fixed width, never overflows page */}
+      <div style={{
+        width: "100%",
+        maxWidth:"100%",
+        overflowX: "auto",
+        overflowY: "hidden",
+        border: "1px solid #E2E8F0",
+        borderRadius: "0.5rem",
+        boxSizing:"border-box",
+        display:"block",
+      }}>
         <table style={{
-          minWidth: "900px",
+          width: "max-content",
           borderCollapse: "collapse",
           tableLayout: "fixed",
-          width: `${280 + TOTAL_MONTHS * 80}px`,
         }}>
-          <colgroup>
-            <col style={{ width: "280px" }} />
-            {Array.from({ length: TOTAL_MONTHS }, (_, i) => (
-              <col key={i} style={{ width: "80px" }} />
-            ))}
-          </colgroup>
-
           <thead>
-            <tr>
+            <tr style={{ position: "sticky", top: 0, backgroundColor: "#F8FAFC", zIndex: 2 }}>
               {/* Sticky label header */}
               <th style={{
                 ...thStyle,
-                width: "280px",
                 position: "sticky",
                 left: 0,
-                zIndex: 2,
+                zIndex: 3,
+                backgroundColor: "#F1F5F9",
                 textAlign: "left",
                 paddingLeft: "12px",
                 borderRight: "2px solid #D1D5DB",
+                width: "280px",
+                boxShadow: "2px 0 4px rgba(0,0,0,0.1)",
               }}>
                 # Action / Tindakan
               </th>
               {Array.from({ length: TOTAL_MONTHS }, (_, i) => (
                 <th key={i} style={{
                   ...thStyle,
+                  width: "100px",
+                  textAlign: "center",
                   backgroundColor: i % 2 === 0 ? "#F1F5F9" : "#E8EDF5",
                 }}>
                   M{i + 1}
@@ -477,7 +482,9 @@ function GanttChart({ analysis, editedRecs }: { analysis: AnalysisResponse; edit
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
+                    width: "280px",
                     maxWidth: "280px",
+                    boxShadow: "2px 0 4px rgba(0,0,0,0.1)",
                   }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                       <span style={{
@@ -544,6 +551,8 @@ function GanttChart({ analysis, editedRecs }: { analysis: AnalysisResponse; edit
                 fontSize: "10px",
                 color: "#9CA3AF",
                 fontStyle: "italic",
+                minWidth: "280px",
+                boxShadow: "2px 0 4px rgba(0,0,0,0.1)",
               }} />
               <td
                 colSpan={TOTAL_MONTHS}
@@ -587,12 +596,12 @@ interface AnalyticsDashboardProps {
 
 export default function AnalyticsDashboard({ analysis, editedRecs }: AnalyticsDashboardProps) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" , minWidth: 0, width: "100%", overflow: "hidden"}}>
       {/* Section 1 — Current Situation */}
       <SituationSection analysis={analysis} />
 
       {/* Row 1 — Two bar charts side by side, equal width */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" , minWidth: 0}}>
         <CategoryBarChart analysis={analysis} editedRecs={editedRecs ?? null} />
         <BudgetChart analysis={analysis} editedRecs={editedRecs ?? null} />
       </div>
