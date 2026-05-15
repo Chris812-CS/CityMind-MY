@@ -276,6 +276,88 @@ advisor_agent = Agent(
 )
 
 
+def _repair_json(raw: str) -> str:
+    """
+    Attempt to repair common LLM JSON formatting issues:
+    1. Extract the outermost {...} block in case there's surrounding text
+    2. Remove trailing commas before } or ]
+    3. Fix unescaped newlines inside string values
+    4. Truncate at the last complete top-level closing brace if the JSON is cut off
+    """
+    import re
+
+    text = raw.strip()
+
+    # 1. Extract the first complete {...} block
+    start = text.find("{")
+    if start == -1:
+        return text
+    # Find the matching closing brace
+    depth = 0
+    end = -1
+    in_string = False
+    escape_next = False
+    for i, ch in enumerate(text[start:], start=start):
+        if escape_next:
+            escape_next = False
+            continue
+        if ch == "\\" and in_string:
+            escape_next = True
+            continue
+        if ch == '"' and not escape_next:
+            in_string = not in_string
+        if not in_string:
+            if ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    end = i
+                    break
+    if end != -1:
+        text = text[start:end + 1]
+    else:
+        # Truncated — try to close any open structures
+        text = text[start:]
+        open_braces = text.count("{") - text.count("}")
+        open_brackets = text.count("[") - text.count("]")
+        # Close open arrays first, then objects
+        text = text.rstrip().rstrip(",")
+        text += "]" * max(0, open_brackets)
+        text += "}" * max(0, open_braces)
+
+    # 2. Remove trailing commas before } or ]
+    text = re.sub(r",\s*([}\]])", r"\1", text)
+
+    # 3. Fix unescaped literal newlines inside strings (replace with space)
+    def fix_newlines_in_strings(s: str) -> str:
+        result = []
+        in_str = False
+        esc = False
+        for ch in s:
+            if esc:
+                result.append(ch)
+                esc = False
+                continue
+            if ch == "\\" and in_str:
+                result.append(ch)
+                esc = True
+                continue
+            if ch == '"':
+                in_str = not in_str
+                result.append(ch)
+                continue
+            if in_str and ch in ("\n", "\r"):
+                result.append(" ")
+                continue
+            result.append(ch)
+        return "".join(result)
+
+    text = fix_newlines_in_strings(text)
+
+    return text
+
+
 def invoke_advisor(request: AnalyzeRequest, reference_number: str) -> AnalysisResponse:
     """
     Invoke the JPJ MBSJ advisor agent with a structured analysis request.
@@ -327,7 +409,18 @@ Respond ONLY with the JSON object — no other text.
                 raw_text = raw_text[4:]
             raw_text = raw_text.strip()
 
-        parsed = json.loads(raw_text)
+        # Attempt 1: parse as-is
+        try:
+            parsed = json.loads(raw_text)
+        except json.JSONDecodeError:
+            # Attempt 2: repair common LLM JSON issues then retry
+            repaired = _repair_json(raw_text)
+            try:
+                parsed = json.loads(repaired)
+            except json.JSONDecodeError as e2:
+                logger.error(f"JSON repair failed. Original error: {e2}")
+                logger.error(f"Raw text snippet: {raw_text[:500]}")
+                raise ValueError(f"Agent returned invalid JSON: {e2}")
 
         # Ensure reference number matches
         parsed["reference_number"] = reference_number
