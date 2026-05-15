@@ -1,0 +1,13 @@
+{
+  "name": "jpj-traffic-walkability-advisor",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --names \"backend,frontend\" --prefix-colors \"cyan,magenta\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "backend\\venv\\Scripts\\uvicorn.exe main:app --reload --port 8000 --app-dir backend",
+    "dev:frontend": "npm run dev --prefix frontend"
+  },
+  "devDependencies": {
+    "concurrently": "9.1.2"
+  }
+}
