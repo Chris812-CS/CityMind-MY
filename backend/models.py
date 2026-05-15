@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator
 from enum import Enum
 from typing import Literal
 
@@ -72,22 +72,22 @@ PolicyOption = Literal[
 
 class AnalyzeRequest(BaseModel):
     # Step 1 — Location
-    state: str                              # e.g. "Selangor" or "W.P. Kuala Lumpur"
-    city: str                               # e.g. "Puchong" or "Kuala Lumpur"
-    street: str                             # e.g. "Jalan Puchong"
-    location_context: str = ""             # verified context string from frontend constants
+    state: str
+    city: str
+    street: str
+    location_context: str = ""
 
     # Step 2 — Situation
     traffic_level: TrafficLevel
-    transport_problems: list[TransportProblem]   # 1–3
+    transport_problems: list[TransportProblem]
     time_period: TimePeriod
     day_type: DayType
-    affected_groups: list[AffectedGroup]         # 1+
+    affected_groups: list[AffectedGroup]
 
     # Step 3 — Conditions
     weather: WeatherCondition
     budget_range: BudgetRange
-    exact_budget: float | None = None   # optional override — takes precedence over range limit
+    exact_budget: float | None = None
     policy_to_evaluate: PolicyOption
 
     @field_validator("exact_budget")
@@ -137,7 +137,7 @@ class Recommendations(BaseModel):
 
 
 class SituationMetrics(BaseModel):
-    severity_score: int                    # 1–10
+    severity_score: int
     daily_time_wasted_minutes: int
     accident_risk: Literal["Low", "Moderate", "High", "Critical"]
     estimated_affected_commuters: int
@@ -145,15 +145,14 @@ class SituationMetrics(BaseModel):
 
 
 class BudgetEstimates(BaseModel):
-    traffic_flow: int
-    public_transport: int
-    walkability: int
-    policy_enforcement: int
-    total: int
+    traffic_flow: float
+    public_transport: float
+    walkability: float
+    policy_enforcement: float
+    total: float
 
 
 class DeferredRecommendation(BaseModel):
-    """A recommendation that has been deferred by the officer, with its cost breakdown."""
     action: str
     responsible_party: str
     estimated_timeline: str
@@ -165,6 +164,8 @@ class DeferredRecommendation(BaseModel):
 
 
 class AnalysisResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
+
     reference_number: str
     summary: str
     location_context: str
@@ -173,12 +174,12 @@ class AnalysisResponse(BaseModel):
     recommendations: Recommendations
     risk_assessment: str
     priority_actions: list[str]
-    situation_metrics: SituationMetrics
+    situation_metrics: SituationMetrics | None = None
     budget_estimates: BudgetEstimates
-    budget_total: int = 0           # sum of all recommendation estimated_cost values
+    budget_total: int = 0
     warnings: list[str] = []
-    has_edited_costs: bool = False  # True when officer has manually adjusted costs
-    deferred_recommendations: list[DeferredRecommendation] = []  # officer-deferred items
+    has_edited_costs: bool = False
+    deferred_recommendations: list[DeferredRecommendation] = []
 
 
 class ReportRequest(BaseModel):
