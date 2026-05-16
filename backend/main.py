@@ -1,5 +1,5 @@
 """
-main.py — FastAPI application entry point for the JPJ Traffic & Walkability AI Advisor.
+main.py — FastAPI application entry point for CityMind MY — JPJ Traffic & Walkability AI Advisor.
 
 Exposes:
   GET  /health   — liveness check
@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 app = FastAPI(
-    title="JPJ Traffic & Walkability AI Advisor",
+    title="CityMind MY — JPJ Traffic & Walkability AI Advisor",
     description="AI-powered traffic and walkability analysis for JPJ officers.",
     version="1.0.0",
 )

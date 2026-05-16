@@ -1,5 +1,5 @@
 """
-PDF report generator for JPJ Traffic & Walkability AI Advisor.
+PDF report generator for CityMind MY — JPJ Traffic & Walkability AI Advisor.
 Generates a government-style PDF entirely in-memory using ReportLab Platypus.
 """
 
@@ -1190,7 +1190,7 @@ def generate_pdf_report(analysis: AnalysisResponse) -> io.BytesIO:
         topMargin=MARGIN,
         bottomMargin=25 * mm,  # leave room for footer
         title="Laporan Analisis Trafik dan Kemudahan Pejalan Kaki",
-        author="JPJ AI Advisor",
+        author="CityMind MY — JPJ AI Advisor",
     )
 
     styles = _build_styles()
