@@ -16,6 +16,7 @@ const CATEGORY_ICONS: Record<RecommendationCategory, string> = {
   public_transport: "🚌",
   walkability: "🚶",
   policy_enforcement: "📋",
+  affected_groups: "👥",
 };
 
 const CATEGORY_LABELS: Record<RecommendationCategory, string> = {
@@ -23,6 +24,7 @@ const CATEGORY_LABELS: Record<RecommendationCategory, string> = {
   public_transport: "Transport",
   walkability: "Walkability",
   policy_enforcement: "Policy",
+  affected_groups: "Affected Groups",
 };
 
 const CATEGORY_COLORS: Record<RecommendationCategory, string> = {
@@ -30,6 +32,7 @@ const CATEGORY_COLORS: Record<RecommendationCategory, string> = {
   public_transport: "#2563EB",
   walkability: "#16A34A",
   policy_enforcement: "#D97706",
+  affected_groups: "#7C3AED",
 };
 
 const PRIORITY_COLORS: Record<PriorityLevel, string> = {
@@ -92,6 +95,7 @@ export function flattenAndSort(recommendations: Recommendations): FlatRec[] {
     "public_transport",
     "walkability",
     "policy_enforcement",
+    "affected_groups",
   ];
   const raw: (Recommendation & { category: RecommendationCategory })[] = [];
   for (const cat of cats) {
@@ -130,6 +134,7 @@ function BudgetSummaryBar({
     public_transport: 0,
     walkability: 0,
     policy_enforcement: 0,
+    affected_groups: 0,
   };
   for (const r of recs) {
     if (r.status === "Deferred") continue; // exclude deferred from budget total

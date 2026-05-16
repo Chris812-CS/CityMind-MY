@@ -493,6 +493,14 @@ def _build_situation_metrics(analysis: AnalysisResponse, styles: dict) -> list:
          Paragraph(m.congestion_description or "—", styles["table_cell"])],
     ]
 
+    # Append inferred affected groups row if available
+    groups = getattr(m, 'inferred_affected_groups', []) or []
+    if groups:
+        data.append([
+            Paragraph("Kumpulan Terjejas / Affected Groups", styles["table_cell"]),
+            Paragraph(", ".join(groups), styles["body"]),
+        ])
+
     tbl = Table(data, colWidths=[col_w * 0.40, col_w * 0.60])
     tbl.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), HEADER_BG),
@@ -531,6 +539,7 @@ def _build_visual_analysis(analysis: AnalysisResponse, styles: dict, deferred_ac
         ("public_transport", "🚌 Public Transport"),
         ("walkability", "🚶 Walkability"),
         ("policy_enforcement", "📋 Policy & Enforcement"),
+        ("affected_groups", "👥 Affected Groups"),
     ]
     cat_data = [
         [Paragraph("<b>Kategori</b>", styles["table_header"]),
@@ -580,7 +589,8 @@ def _build_visual_analysis(analysis: AnalysisResponse, styles: dict, deferred_ac
     pt = _active_cost(analysis.recommendations.public_transport)
     wk = _active_cost(analysis.recommendations.walkability)
     pe = _active_cost(analysis.recommendations.policy_enforcement)
-    active_total = tf + pt + wk + pe
+    ag = _active_cost(getattr(analysis.recommendations, 'affected_groups', []) or [])
+    active_total = tf + pt + wk + pe + ag
 
     budget_data = [
         [Paragraph("<b>Kategori</b>", styles["table_header"]),
@@ -589,6 +599,7 @@ def _build_visual_analysis(analysis: AnalysisResponse, styles: dict, deferred_ac
         [Paragraph("🚌 Public Transport", styles["table_cell"]), Paragraph(f"RM {pt:,}", styles["table_cell"])],
         [Paragraph("🚶 Walkability", styles["table_cell"]), Paragraph(f"RM {wk:,}", styles["table_cell"])],
         [Paragraph("📋 Policy & Enforcement", styles["table_cell"]), Paragraph(f"RM {pe:,}", styles["table_cell"])],
+        [Paragraph("👥 Affected Groups", styles["table_cell"]), Paragraph(f"RM {ag:,}", styles["table_cell"])],
         [Paragraph("<b>JUMLAH AKTIF / ACTIVE TOTAL</b>", styles["table_cell"]),
          Paragraph(f"<b>RM {active_total:,}</b>", styles["table_cell"])],
     ]
@@ -650,14 +661,16 @@ def _build_budget_summary(analysis: AnalysisResponse, styles: dict) -> list:
         list(analysis.recommendations.traffic_flow) +
         list(analysis.recommendations.public_transport) +
         list(analysis.recommendations.walkability) +
-        list(analysis.recommendations.policy_enforcement)
+        list(analysis.recommendations.policy_enforcement) +
+        list(getattr(analysis.recommendations, 'affected_groups', []) or [])
     )
 
     tf = _cat_total_active(analysis.recommendations.traffic_flow)
     pt = _cat_total_active(analysis.recommendations.public_transport)
     wk = _cat_total_active(analysis.recommendations.walkability)
     pe = _cat_total_active(analysis.recommendations.policy_enforcement)
-    grand = tf + pt + wk + pe
+    ag = _cat_total_active(getattr(analysis.recommendations, 'affected_groups', []) or [])
+    grand = tf + pt + wk + pe + ag
 
     deferred_total = sum(_cat_total_deferred([r]) for r in all_recs)
 
@@ -672,6 +685,8 @@ def _build_budget_summary(analysis: AnalysisResponse, styles: dict) -> list:
          Paragraph(f"RM {int(wk):,}", styles["table_cell"])],
         [Paragraph("📋 Dasar & Penguatkuasaan / Policy & Enforcement", styles["table_cell"]),
          Paragraph(f"RM {int(pe):,}", styles["table_cell"])],
+        [Paragraph("👥 Kumpulan Terjejas / Affected Groups", styles["table_cell"]),
+         Paragraph(f"RM {int(ag):,}", styles["table_cell"])],
         [Paragraph("<b>JUMLAH KESELURUHAN / GRAND TOTAL</b>",
                    ParagraphStyle("GrandTotalText", parent=styles["table_cell"],
                                   textColor=colors.white, fontName="Helvetica-Bold")),
@@ -820,7 +835,7 @@ def _classify_gantt_item(action: str, category: str, priority: str) -> dict:
 def _build_gantt_items(analysis: AnalysisResponse) -> list:
     """Build Gantt item list with start months and dependencies."""
     import re
-    cats = ["traffic_flow", "public_transport", "walkability", "policy_enforcement"]
+    cats = ["traffic_flow", "public_transport", "walkability", "policy_enforcement", "affected_groups"]
     priority_order = {"Critical": 0, "High": 1, "Medium": 2}
 
     all_recs = []
@@ -1261,7 +1276,17 @@ def generate_pdf_report(analysis: AnalysisResponse) -> io.BytesIO:
         has_edited_costs=has_edited,
     ))
 
-    # 11. Risk Assessment
+    # 11. Affected Groups Recommendations (active only)
+    ag_recs = _active(getattr(analysis.recommendations, 'affected_groups', []) or [])
+    if ag_recs:
+        story.extend(_build_recommendations_table(
+            "Affected Groups Recommendations / Cadangan Kumpulan Terjejas",
+            ag_recs,
+            styles,
+            has_edited_costs=has_edited,
+        ))
+
+    # 12. Risk Assessment
     story.extend(_build_risk_assessment(analysis, styles))
 
     # 12. Deferred Recommendations (if any)

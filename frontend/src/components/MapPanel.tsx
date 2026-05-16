@@ -16,27 +16,31 @@ L.Icon.Default.mergeOptions({
 });
 
 // ---------------------------------------------------------------------------
-// Marker icons — colored CDN icons
+// Emoji DivIcon markers — no external CDN dependency, works in all browsers
 // ---------------------------------------------------------------------------
-const CDN = "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img";
-const SHADOW = "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png";
-
-const makeIcon = (color: string, size: [number, number] = [25, 41]) =>
-  new L.Icon({
-    iconUrl: `${CDN}/marker-icon-2x-${color}.png`,
-    shadowUrl: SHADOW,
-    iconSize: size,
-    iconAnchor: [Math.floor(size[0] / 2), size[1]],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
+const makeEmojiIcon = (emoji: string, size = 32, pulse = false) =>
+  L.divIcon({
+    className: pulse ? "emoji-marker pulse-marker" : "emoji-marker",
+    html: `<div style="
+      font-size: ${size}px;
+      line-height: 1;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.35));
+      cursor: pointer;
+      user-select: none;
+    ">${emoji}</div>`,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size],
+    popupAnchor: [0, -size],
   });
 
-const RED_MARKER    = makeIcon("red");
-const BLUE_MARKER   = makeIcon("blue");
-const ORANGE_MARKER = makeIcon("orange");
-const GREEN_MARKER  = makeIcon("green");
-// Accident hotspot: slightly larger red icon
-const HOTSPOT_MARKER = makeIcon("red", [30, 49]);
+// Main location pin
+const PIN_ICON = makeEmojiIcon("📍", 34);
+
+// Landmark category icons
+const SCHOOL_ICON    = makeEmojiIcon("🏫", 30);
+const COMMERCIAL_ICON = makeEmojiIcon("🏬", 30);
+const HOTSPOT_ICON   = makeEmojiIcon("⚠️", 32, true);   // pulsing
+const BUS_STOP_ICON  = makeEmojiIcon("🚌", 30);
 
 // ---------------------------------------------------------------------------
 // Landmark data
@@ -52,16 +56,13 @@ interface Landmark {
 
 const LANDMARKS: Record<string, Landmark[]> = {
   Puchong: [
-    // Schools
     { name: "SJK(C) Han Ming", category: "school", coordinates: [3.0280, 101.6150], note: "Primary school — school zone active 7–8am and 1–2pm" },
     { name: "SMK Puchong Permai", category: "school", coordinates: [3.0350, 101.6220], note: "Secondary school — contributes to morning peak congestion" },
     { name: "SMK Puchong", category: "school", coordinates: [3.0300, 101.6180], note: "Secondary school — school zone on Jalan Puchong" },
-    // Malls/Commercial
     { name: "IOI Mall Puchong", category: "commercial", coordinates: [3.0180, 101.6280], note: "Major retail hub — high weekend traffic generator" },
     { name: "Setia Walk", category: "commercial", coordinates: [3.0250, 101.6200], note: "Commercial strip — peak activity evenings and weekends" },
     { name: "Tesco Extra Puchong", category: "commercial", coordinates: [3.0320, 101.6150], note: "Hypermarket — delivery lorry traffic congestion point" },
     { name: "Giant IOI Bandar Puteri", category: "commercial", coordinates: [3.0150, 101.6300], note: "Supermarket — contributes to Bandar Puteri junction congestion" },
-    // Accident Hotspots
     { name: "Puchong Perdana Junction", category: "accident_hotspot", coordinates: [3.0280, 101.6180], note: "Known accident blackspot — multiple recorded crashes. Critical congestion zone." },
     { name: "Puchong Utama Junction", category: "accident_hotspot", coordinates: [3.0340, 101.6210], note: "Known accident blackspot — critical congestion. Hit-and-run Sep 2025." },
     { name: "Jalan Puchong/LDP Intersection (MTree Hotel)", category: "accident_hotspot", coordinates: [3.0200, 101.6250], note: "Known accident blackspot — 3 vehicles rammed at 12:30am May 2025." },
@@ -69,21 +70,19 @@ const LANDMARKS: Record<string, Landmark[]> = {
     { name: "Jalan Puchong Puteri 2/7 Traffic Lights", category: "accident_hotspot", coordinates: [3.0310, 101.6190], note: "Hit-and-run Mar 2026 — red light runner fled scene at 8pm." },
   ],
   "Kuala Lumpur": [
-    // Accident Hotspots
     { name: "NPE Flyover Merging Zone", category: "accident_hotspot", coordinates: [3.1090, 101.6410], note: "Accident blackspot — tour bus hit-and-run Apr 2026, frequent lane-merge crashes off NPE ramps" },
-    { name: "Jalan Othman Intersection", category: "accident_hotspot", coordinates: [3.1060, 101.6370], note: "High-risk junction — car and bike burst into flames May 2024, red-light runner incident, T-bone crashes" },
+    { name: "Jalan Othman Intersection", category: "accident_hotspot", coordinates: [3.1060, 101.6370], note: "High-risk junction — car and bike burst into flames May 2024, red-light runner incident" },
     { name: "PJ Old Town Curve", category: "accident_hotspot", coordinates: [3.1045, 101.6355], note: "Illegal parking narrows lanes from 2 to 1, frequent evasive braking crashes" },
-    // Infrastructure / Schools
     { name: "Jalan Templer / Jalan Gasing Junction", category: "school", coordinates: [3.1073, 101.6389], note: "Major arterial junction — 260,000 vehicles/day, MBPJ contraflow 5–7pm weekdays" },
-    { name: "Jalan Othman Traffic Light", category: "school", coordinates: [3.1060, 101.6370], note: "Former roundabout converted to traffic lights — increased throughput by 50% (The Edge Malaysia)" },
+    { name: "Jalan Othman Traffic Light", category: "school", coordinates: [3.1060, 101.6370], note: "Former roundabout converted to traffic lights — increased throughput by 50%" },
   ],
 };
 
-const LANDMARK_ICONS: Record<LandmarkCategory, L.Icon> = {
-  school: BLUE_MARKER,
-  commercial: ORANGE_MARKER,
-  accident_hotspot: HOTSPOT_MARKER,
-  bus_stop: GREEN_MARKER,
+const LANDMARK_ICONS: Record<LandmarkCategory, L.DivIcon> = {
+  school: SCHOOL_ICON,
+  commercial: COMMERCIAL_ICON,
+  accident_hotspot: HOTSPOT_ICON,
+  bus_stop: BUS_STOP_ICON,
 };
 
 const LANDMARK_EMOJI: Record<LandmarkCategory, string> = {
@@ -126,15 +125,16 @@ const HEAT_SEGMENTS: Record<string, HeatSegment[]> = {
     { positions: [[3.0260, 101.6170], [3.0280, 101.6180]], level: "light",    label: "Side road approach — Light congestion" },
   ],
   "Kuala Lumpur": [
-    { positions: [[3.1080, 101.6395], [3.1090, 101.6410]], level: "critical", label: "NPE Flyover Merging Zone — Critical congestion, accident blackspot" },
-    { positions: [[3.1060, 101.6370], [3.1073, 101.6389]], level: "critical", label: "Jalan Othman intersection — Red-light runner zone, T-bone crashes" },
+    { positions: [[3.1080, 101.6395], [3.1090, 101.6410]], level: "critical", label: "NPE Flyover Merging Zone — Critical congestion" },
+    { positions: [[3.1060, 101.6370], [3.1073, 101.6389]], level: "critical", label: "Jalan Othman intersection — Red-light runner zone" },
     { positions: [[3.1045, 101.6355], [3.1060, 101.6370]], level: "common",   label: "PJ Old Town Curve — Illegal parking narrows to 1 lane" },
     { positions: [[3.1073, 101.6389], [3.1090, 101.6410]], level: "common",   label: "Main bypass corridor — Highway overflow traffic" },
   ],
 };
 
 // ---------------------------------------------------------------------------
-// Props
+// Props — keep recommendations/highlightedCategory/onOverlayClick in props
+// for backward compatibility, but no longer render circles
 // ---------------------------------------------------------------------------
 interface MapPanelProps {
   location: LocationOption | null;
@@ -144,26 +144,8 @@ interface MapPanelProps {
   onOverlayClick: (category: RecommendationCategory) => void;
 }
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
 const DEFAULT_CENTER: [number, number] = [3.8077, 108.9];
 const DEFAULT_ZOOM = 6;
-const CIRCLE_RADIUS = 150;
-const OFFSET = 0.0015;
-
-interface OverlayConfig {
-  category: RecommendationCategory;
-  color: string;
-  offset: [number, number];
-}
-
-const OVERLAY_CONFIGS: OverlayConfig[] = [
-  { category: "traffic_flow",       color: "#DC2626", offset: [OFFSET, 0] },
-  { category: "public_transport",   color: "#2563EB", offset: [0, OFFSET] },
-  { category: "walkability",        color: "#16A34A", offset: [-OFFSET, 0] },
-  { category: "policy_enforcement", color: "#D97706", offset: [0, -OFFSET] },
-];
 
 // ---------------------------------------------------------------------------
 // FlyToLocation
@@ -181,7 +163,7 @@ function FlyToLocation({ location }: { location: LocationOption | null }) {
 }
 
 // ---------------------------------------------------------------------------
-// Combined legend — heatmap + landmark categories
+// Map legend
 // ---------------------------------------------------------------------------
 function MapLegend({ showLandmarks }: { showLandmarks: boolean }) {
   return (
@@ -190,37 +172,35 @@ function MapLegend({ showLandmarks }: { showLandmarks: boolean }) {
       bottom: "12px",
       left: "12px",
       zIndex: 1000,
-      backgroundColor: "rgba(255,255,255,0.95)",
-      borderRadius: "6px",
-      padding: "8px 10px",
-      boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+      backgroundColor: "rgba(255,255,255,0.97)",
+      borderRadius: "8px",
+      padding: "10px 12px",
+      boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
       fontSize: "11px",
       lineHeight: 1.7,
       pointerEvents: "none",
-      maxWidth: "180px",
+      maxWidth: "190px",
     }}>
-      {/* Traffic heatmap */}
-      <div style={{ fontWeight: 700, marginBottom: "3px", color: "#1E3A5F", fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+      <div style={{ fontWeight: 800, marginBottom: "4px", color: "#1E3A5F", fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
         Traffic Heatmap
       </div>
       {(["critical", "common", "light"] as HeatLevel[]).map((level) => (
-        <div key={level} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <div style={{ width: "18px", height: "4px", borderRadius: "2px", backgroundColor: HEAT_COLORS[level] }} />
+        <div key={level} style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+          <div style={{ width: "20px", height: "5px", borderRadius: "3px", backgroundColor: HEAT_COLORS[level], flexShrink: 0 }} />
           <span style={{ color: "#374151", fontSize: "10px" }}>
             {level === "critical" ? "Critical" : level === "common" ? "Common" : "Light"}
           </span>
         </div>
       ))}
 
-      {/* Landmark categories */}
       {showLandmarks && (
         <>
-          <div style={{ fontWeight: 700, marginTop: "6px", marginBottom: "3px", color: "#1E3A5F", fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+          <div style={{ fontWeight: 800, marginTop: "8px", marginBottom: "4px", color: "#1E3A5F", fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
             Landmarks
           </div>
           {(["school", "commercial", "accident_hotspot"] as LandmarkCategory[]).map((cat) => (
             <div key={cat} style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-              <span style={{ fontSize: "12px" }}>{LANDMARK_EMOJI[cat]}</span>
+              <span style={{ fontSize: "14px", lineHeight: 1 }}>{LANDMARK_EMOJI[cat]}</span>
               <span style={{ color: "#374151", fontSize: "10px" }}>{LANDMARK_LABEL[cat]}</span>
             </div>
           ))}
@@ -236,9 +216,6 @@ function MapLegend({ showLandmarks }: { showLandmarks: boolean }) {
 export default function MapPanel({
   location,
   selectedCity,
-  recommendations,
-  highlightedCategory,
-  onOverlayClick,
 }: MapPanelProps) {
   const heatSegments = selectedCity ? (HEAT_SEGMENTS[selectedCity] ?? []) : [];
   const landmarks = selectedCity ? (LANDMARKS[selectedCity] ?? []) : [];
@@ -247,17 +224,14 @@ export default function MapPanel({
 
   return (
     <div style={{ position: "relative", height: "100%", width: "100%" }}>
-      {/* Pulsing animation for hotspot markers */}
+      {/* Pulse + emoji marker CSS */}
       <style>{`
-        @keyframes markerPulse {
-          0%   { opacity: 1; transform: scale(1); }
-          50%  { opacity: 0.6; transform: scale(1.15); }
-          100% { opacity: 1; transform: scale(1); }
+        .emoji-marker { background: transparent !important; border: none !important; }
+        @keyframes hotspotPulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50%       { transform: scale(1.25); opacity: 0.75; }
         }
-        .hotspot-pulse img {
-          animation: markerPulse 1.8s ease-in-out infinite;
-          transform-origin: bottom center;
-        }
+        .pulse-marker div { animation: hotspotPulse 1.8s ease-in-out infinite; }
       `}</style>
 
       <MapContainer
@@ -274,7 +248,7 @@ export default function MapPanel({
 
         {/* Main location pin */}
         {location && (
-          <Marker position={location.coordinates} icon={RED_MARKER}>
+          <Marker position={location.coordinates} icon={PIN_ICON}>
             <Popup>
               <strong>{location.markerLabel}</strong>
             </Popup>
@@ -292,7 +266,7 @@ export default function MapPanel({
           </Polyline>
         ))}
 
-        {/* Non-hotspot landmark markers */}
+        {/* Non-hotspot landmarks — emoji markers */}
         {otherLandmarks.map((lm, i) => (
           <Marker key={`lm-${i}`} position={lm.coordinates} icon={LANDMARK_ICONS[lm.category]}>
             <Popup>
@@ -309,14 +283,9 @@ export default function MapPanel({
           </Marker>
         ))}
 
-        {/* Accident hotspot markers — pulsing class */}
+        {/* Accident hotspot markers — pulsing emoji */}
         {hotspots.map((lm, i) => (
-          <Marker
-            key={`hs-${i}`}
-            position={lm.coordinates}
-            icon={HOTSPOT_MARKER}
-            // Apply pulse CSS class via ref trick using className on the wrapper div
-          >
+          <Marker key={`hs-${i}`} position={lm.coordinates} icon={HOTSPOT_ICON}>
             <Popup>
               <div style={{ fontSize: "13px" }}>
                 <div style={{ fontWeight: 700, marginBottom: "4px", color: "#DC2626" }}>
@@ -331,49 +300,17 @@ export default function MapPanel({
           </Marker>
         ))}
 
-        {/* Pulsing circles behind hotspot markers for visual attention */}
+        {/* Small pulsing circle ring around each hotspot for extra visibility */}
         {hotspots.map((lm, i) => (
           <Circle
-            key={`pulse-${i}`}
+            key={`ring-${i}`}
             center={lm.coordinates}
-            radius={40}
-            pathOptions={{
-              color: "#DC2626",
-              fillColor: "#DC2626",
-              fillOpacity: 0.15,
-              weight: 2,
-              dashArray: "4 4",
-            }}
+            radius={35}
+            pathOptions={{ color: "#DC2626", fillColor: "#DC2626", fillOpacity: 0.08, weight: 1.5, dashArray: "5 4" }}
           />
         ))}
-
-        {/* Category circle overlays — shown when recommendations available */}
-        {location &&
-          recommendations &&
-          OVERLAY_CONFIGS.map(({ category, color, offset }) => {
-            const circleCenter: [number, number] = [
-              location.coordinates[0] + offset[0],
-              location.coordinates[1] + offset[1],
-            ];
-            const isHighlighted = highlightedCategory === category;
-            return (
-              <Circle
-                key={category}
-                center={circleCenter}
-                radius={CIRCLE_RADIUS}
-                pathOptions={{
-                  color,
-                  fillColor: color,
-                  fillOpacity: isHighlighted ? 0.65 : 0.3,
-                  weight: isHighlighted ? 3 : 2,
-                }}
-                eventHandlers={{ click: () => onOverlayClick(category) }}
-              />
-            );
-          })}
       </MapContainer>
 
-      {/* Legend */}
       {selectedCity && <MapLegend showLandmarks={landmarks.length > 0} />}
     </div>
   );

@@ -13,7 +13,7 @@ import PdfDownloadButton from "./components/PdfDownloadButton";
 import AnalyticsDashboard from "./components/AnalyticsDashboard";
 
 export default function App() {
-  const { analysis, isLoading, error, analyze, lastBudgetRange, lastExactBudget } = useAnalysis();
+  const { analysis, isLoading, error, analyze, lastBudgetRange, lastExactBudget, lastAdditionalContext } = useAnalysis();
   const [highlightedCategory, setHighlightedCategory] =
     useState<RecommendationCategory | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<LocationOption | null>(null);
@@ -31,28 +31,27 @@ export default function App() {
     ...analysis,
     recommendations: {
       traffic_flow: editedRecs.filter((r) => r.category === "traffic_flow").map((r) => ({
-        ...r, cost_breakdown: r.editedBreakdown,
-        estimated_cost: recCost(r),
+        ...r, cost_breakdown: r.editedBreakdown, estimated_cost: recCost(r),
       })),
       public_transport: editedRecs.filter((r) => r.category === "public_transport").map((r) => ({
-        ...r, cost_breakdown: r.editedBreakdown,
-        estimated_cost: recCost(r),
+        ...r, cost_breakdown: r.editedBreakdown, estimated_cost: recCost(r),
       })),
       walkability: editedRecs.filter((r) => r.category === "walkability").map((r) => ({
-        ...r, cost_breakdown: r.editedBreakdown,
-        estimated_cost: recCost(r),
+        ...r, cost_breakdown: r.editedBreakdown, estimated_cost: recCost(r),
       })),
       policy_enforcement: editedRecs.filter((r) => r.category === "policy_enforcement").map((r) => ({
-        ...r, cost_breakdown: r.editedBreakdown,
-        estimated_cost: recCost(r),
+        ...r, cost_breakdown: r.editedBreakdown, estimated_cost: recCost(r),
+      })),
+      affected_groups: editedRecs.filter((r) => r.category === "affected_groups").map((r) => ({
+        ...r, cost_breakdown: r.editedBreakdown, estimated_cost: recCost(r),
       })),
     },
     budget_estimates: {
-      // Only active (non-deferred) recs count toward budget
       traffic_flow: (activeRecs ?? []).filter((r) => r.category === "traffic_flow").reduce((s, r) => s + recCost(r), 0),
       public_transport: (activeRecs ?? []).filter((r) => r.category === "public_transport").reduce((s, r) => s + recCost(r), 0),
       walkability: (activeRecs ?? []).filter((r) => r.category === "walkability").reduce((s, r) => s + recCost(r), 0),
       policy_enforcement: (activeRecs ?? []).filter((r) => r.category === "policy_enforcement").reduce((s, r) => s + recCost(r), 0),
+      affected_groups: (activeRecs ?? []).filter((r) => r.category === "affected_groups").reduce((s, r) => s + recCost(r), 0),
       total: (activeRecs ?? []).reduce((s, r) => s + recCost(r), 0),
     },
     has_edited_costs: editedRecs.some((r) => r.isEdited),
@@ -124,7 +123,7 @@ export default function App() {
         style={{
           flex: 1,
           display: "grid",
-          gridTemplateColumns: "35fr 65fr",
+          gridTemplateColumns: "30fr 70fr",
           gap: "1.25rem",
           padding: "1.25rem",
           maxWidth: "1600px",
@@ -214,7 +213,7 @@ export default function App() {
         </div>
 
         {/* ── Right column: SummaryBanner + Analytics + RecommendationPanel + PdfDownloadButton ── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", position: "relative" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", position: "relative", minWidth: 0, overflow: "hidden" }}>
 
           {/* Loading overlay — covers right column only */}
           {isLoading && (
@@ -328,10 +327,34 @@ export default function App() {
               </div>
             )}
 
+            {/* Additional context ignored banner */}
+            {analysis?.additional_context_used === false && lastAdditionalContext && (
+              <div role="alert" style={{
+                padding: "0.625rem 1rem",
+                backgroundColor: "#FEF2F2",
+                border: "1px solid #FECACA",
+                borderRadius: "0.5rem",
+                color: "#991B1B",
+                fontSize: "0.875rem",
+                display: "flex",
+                gap: "0.5rem",
+                alignItems: "flex-start",
+              }}>
+                <span style={{ flexShrink: 0 }}>⚠️</span>
+                <span>
+                  <strong>Maklumat tambahan tidak berkaitan / Additional context not used</strong>
+                  {" "}— Maklumat tambahan yang dimasukkan tidak berkaitan dan tidak diambil kira dalam analisis ini. / The additional context provided was not relevant and has not been considered in this analysis.
+                </span>
+              </div>
+            )}
+
             {/* Analytics Dashboard — shown when analysis is available */}
             {analysis && (
-              <section aria-label="Analytics Dashboard">
-              <AnalyticsDashboard analysis={analysis} editedRecs={editedRecs} />
+              <section 
+                aria-label="Analytics Dashboard"
+                style={{ minWidth: 0, width: "100%", overflow: "hidden" }}
+              >
+                <AnalyticsDashboard analysis={analysis} editedRecs={editedRecs} />
               </section>
             )}
 

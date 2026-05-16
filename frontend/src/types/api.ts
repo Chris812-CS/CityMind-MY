@@ -4,7 +4,8 @@ export type RecommendationCategory =
   | "traffic_flow"
   | "public_transport"
   | "walkability"
-  | "policy_enforcement";
+  | "policy_enforcement"
+  | "affected_groups";
 
 // ---------------------------------------------------------------------------
 // Structured request — replaces free-text conditions + constraints
@@ -22,23 +23,13 @@ export type TransportProblem =
   | "Event traffic";
 
 export type TimePeriod =
-  | "Morning Peak (6-9am)"
-  | "Off-Peak (9am-12pm)"
-  | "Afternoon Peak (12-3pm)"
-  | "Evening Peak (3-7pm)"
+  | "Morning Peak (6am-9am)"
+  | "Off Peak (9am-12pm)"
+  | "Afternoon Peak (12pm-3pm)"
+  | "Evening Peak (3pm-7pm)"
   | "Night (7pm-6am)";
 
 export type DayType = "Weekday" | "Weekend" | "Public Holiday";
-
-export type AffectedGroup =
-  | "Commuters"
-  | "School children"
-  | "Pedestrians"
-  | "Cyclists"
-  | "Residents"
-  | "Commercial vehicles";
-
-export type WeatherCondition = "Clear" | "Light Rain" | "Heavy Rain" | "Fog" | "N/A";
 
 export type BudgetRange =
   | "Under RM10k"
@@ -63,22 +54,21 @@ export type PolicyOption =
 
 export interface AnalyzeRequest {
   // Step 1 — Location
-  state: string;                  // e.g. "Selangor" or "W.P. Kuala Lumpur"
-  city: string;                   // e.g. "Puchong" or "Kuala Lumpur"
-  street: string;                 // e.g. "Jalan Puchong"
-  location_context: string;       // verified context string from CITY_MAP_CONFIG
+  state: string;
+  city: string;
+  street: string;
+  location_context: string;
 
   // Step 2 — Situation
   traffic_level: TrafficLevel;
   transport_problems: TransportProblem[];   // 1–3 selections
+  additional_context?: string;    // optional free text, max 300 chars
   time_period: TimePeriod;
   day_type: DayType;
-  affected_groups: AffectedGroup[];         // 1+ selections
 
-  // Step 3 — Conditions
-  weather: WeatherCondition;
+  // Step 3 — Conditions (budget only; weather/affected groups inferred by LLM)
   budget_range: BudgetRange;
-  exact_budget?: number;          // optional override — float, max 2 decimal places
+  exact_budget?: number;
   policy_to_evaluate: PolicyOption;
 }
 
@@ -115,6 +105,7 @@ export interface Recommendations {
   public_transport: Recommendation[];
   walkability: Recommendation[];
   policy_enforcement: Recommendation[];
+  affected_groups: Recommendation[];
 }
 
 export interface DeferredRecommendation {
@@ -143,16 +134,18 @@ export interface AnalysisResponse {
   warnings?: string[];
   has_edited_costs?: boolean;
   deferred_recommendations?: DeferredRecommendation[];
+  additional_context_used?: boolean;  // true if LLM used the additional context, false if ignored
 }
 
 export type AccidentRisk = "Low" | "Moderate" | "High" | "Critical";
 
 export interface SituationMetrics {
-  severity_score: number;                    // 1–10
+  severity_score: number;
   daily_time_wasted_minutes: number;
   accident_risk: AccidentRisk;
   estimated_affected_commuters: number;
   congestion_description: string;
+  inferred_affected_groups: string[];   // e.g. ["Commuters", "School children", "Cyclists"]
 }
 
 export interface BudgetEstimates {
@@ -160,5 +153,6 @@ export interface BudgetEstimates {
   public_transport: number;
   walkability: number;
   policy_enforcement: number;
+  affected_groups: number;
   total: number;
 }

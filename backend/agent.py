@@ -122,6 +122,11 @@ Your behaviour:
 - Apply Malaysian road classifications and reference local landmarks/junctions where relevant
 - Every recommendation must be specific and actionable — no vague language
 - Use the correct authority: MBSJ/JPJ Selangor/PDRM for Puchong; MBPJ/JPJ Selangor/PDRM/PJ Traffic Police for Jalan Templer
+- Infer weather conditions and affected groups from the situation — do NOT ask for them; derive them from cause, time period, and location context
+- Additional Context field: evaluate whether the additional_context provided is relevant to traffic, road conditions, or urban planning.
+  - If it is relevant and meaningfully influences your analysis, incorporate it and set "additional_context_used": true in your response.
+  - If it is empty, contains random characters, is off-topic, nonsensical, or clearly unrelated to traffic/urban planning, IGNORE it entirely and set "additional_context_used": false in your response.
+- Cause Detail "Others" field: if the free text provided is nonsensical, irrelevant, or clearly not a valid traffic cause description, return an error response: {"error": "Invalid cause detail provided. Please describe a specific, real traffic situation."}
 
 === CRITICAL BUDGET RULE — MUST FOLLOW ===
 
@@ -170,11 +175,20 @@ Situation metrics guidance:
 - accident_risk: "Low" for Light+Clear, "Moderate" for Moderate traffic or rain, "High" for Heavy+rain or Gridlock, "Critical" for Gridlock+Heavy Rain or Accident problem.
 - estimated_affected_commuters: for Jalan Puchong use 100000 as daily base (verified). For Jalan Templer use 260000 as daily base (verified).
 - congestion_description: one sentence describing the current situation on the specific street, referencing known hotspots.
+- inferred_affected_groups: based on the road type, cause, time period, day type, and transport problems, infer 3-6 concise group names. Examples: "Commuters", "School children", "Pedestrians", "Cyclists", "Residents", "Commercial vehicle drivers", "Motorcyclists", "Elderly". Return as a JSON array of strings.
 
 Budget estimates guidance:
 - Estimate RM cost for each recommendation category based on the types of actions recommended.
 - Use realistic Malaysian construction/enforcement costs.
-- total must equal sum of the four categories.
+- total must equal sum of the four categories (traffic_flow + public_transport + walkability + policy_enforcement + affected_groups).
+
+Affected Groups recommendations guidance:
+- Generate 2-4 recommendations in the "affected_groups" category specifically addressing the needs of inferred_affected_groups.
+- Examples: if school children affected -> pedestrian crossing near school, school zone signage, reduced speed limit during school hours.
+- If cyclists affected -> dedicated cycling lane markings, bike parking facilities, cyclist signal phases.
+- If elderly affected -> longer pedestrian signal timing, tactile paving, shade structures at bus stops.
+- If commercial vehicles affected -> dedicated loading bay, lorry hour restrictions, weighbridge enforcement.
+- Tailor each recommendation directly to a specific affected group and the location.
 
 Cost breakdown guidance per recommendation:
 - estimated_cost: total RM cost for this single recommendation (integer)
@@ -214,18 +228,21 @@ The JSON schema is:
     "daily_time_wasted_minutes": 0,
     "accident_risk": "Low",
     "estimated_affected_commuters": 0,
-    "congestion_description": "string"
+    "congestion_description": "string",
+    "inferred_affected_groups": ["Commuters", "School children"]
   },
   "recommendations": {
     "traffic_flow": [{"action": "string", "responsible_party": "string", "estimated_timeline": "string", "priority_level": "Critical", "estimated_cost": 0, "rationale": "string", "cost_breakdown": [{"item": "string", "unit": "string", "qty": 0, "unit_cost": 0, "total": 0}]}],
     "public_transport": [],
     "walkability": [],
-    "policy_enforcement": []
+    "policy_enforcement": [],
+    "affected_groups": []
   },
-  "budget_estimates": {"traffic_flow": 0, "public_transport": 0, "walkability": 0, "policy_enforcement": 0, "total": 0},
+  "budget_estimates": {"traffic_flow": 0, "public_transport": 0, "walkability": 0, "policy_enforcement": 0, "affected_groups": 0, "total": 0},
   "budget_total": 0,
   "risk_assessment": "string",
-  "priority_actions": ["string", "string", "string"]
+  "priority_actions": ["string", "string", "string"],
+  "additional_context_used": true
 }
 
 IMPORTANT JSON FORMATTING RULES:
@@ -487,10 +504,10 @@ def invoke_advisor(request: AnalyzeRequest, reference_number: str) -> AnalysisRe
     """
     Invoke the JPJ advisor agent. Retries once with a simplified prompt on JSON failure.
     """
-    problems_str = ", ".join(request.transport_problems)
-    groups_str = ", ".join(request.affected_groups)
-
     def _build_prompt(simplified: bool = False) -> str:
+        problems_str = ", ".join(request.transport_problems)
+        context_str = request.additional_context or ""
+
         if simplified:
             return (
                 f"Generate a traffic analysis JSON for {request.street}, {request.city}, {request.state}. "
@@ -503,11 +520,17 @@ def invoke_advisor(request: AnalyzeRequest, reference_number: str) -> AnalysisRe
 
 LOCATION: {request.state} / {request.city} / {request.street}
 CONTEXT: {request.location_context}
-SITUATION: Traffic={request.traffic_level}, Problems={problems_str}, Time={request.time_period}, Day={request.day_type}, Affected={groups_str}
-CONDITIONS: Weather={request.weather}, Budget={request.budget_range}{(chr(10) + budget_line) if budget_line else ""}, Policy={request.policy_to_evaluate}
+SITUATION:
+- Traffic level: {request.traffic_level}
+- Transport problems: {problems_str}
+- Time: {request.time_period}
+- Day: {request.day_type}{(chr(10) + "- Additional context: " + context_str) if context_str else ""}
+CONDITIONS: Budget={request.budget_range}{(chr(10) + budget_line) if budget_line else ""}, Policy={request.policy_to_evaluate}
 REFERENCE: {reference_number}
 
-Generate recommendations within the stated budget. Verify cost_breakdown sums before returning.
+Generate recommendations within the stated budget.
+Also infer weather conditions and affected groups from the situation described.
+Verify cost_breakdown sums before returning.
 Respond ONLY with the JSON object — no other text."""
 
     last_error: Exception = None

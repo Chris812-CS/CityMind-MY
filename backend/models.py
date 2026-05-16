@@ -26,25 +26,14 @@ TransportProblem = Literal[
 ]
 
 TimePeriod = Literal[
-    "Morning Peak (6-9am)",
-    "Off-Peak (9am-12pm)",
-    "Afternoon Peak (12-3pm)",
-    "Evening Peak (3-7pm)",
+    "Morning Peak (6am-9am)",
+    "Off Peak (9am-12pm)",
+    "Afternoon Peak (12pm-3pm)",
+    "Evening Peak (3pm-7pm)",
     "Night (7pm-6am)",
 ]
 
 DayType = Literal["Weekday", "Weekend", "Public Holiday"]
-
-AffectedGroup = Literal[
-    "Commuters",
-    "School children",
-    "Pedestrians",
-    "Cyclists",
-    "Residents",
-    "Commercial vehicles",
-]
-
-WeatherCondition = Literal["Clear", "Light Rain", "Heavy Rain", "Fog", "N/A"]
 
 BudgetRange = Literal[
     "Under RM10k",
@@ -79,13 +68,12 @@ class AnalyzeRequest(BaseModel):
 
     # Step 2 — Situation
     traffic_level: TrafficLevel
-    transport_problems: list[TransportProblem]
+    transport_problems: list[TransportProblem]   # 1–3
+    additional_context: str = ""   # optional free text, max 300 chars
     time_period: TimePeriod
     day_type: DayType
-    affected_groups: list[AffectedGroup]
 
-    # Step 3 — Conditions
-    weather: WeatherCondition
+    # Step 3 — Conditions (budget only; weather/affected groups inferred by LLM)
     budget_range: BudgetRange
     exact_budget: float | None = None
     policy_to_evaluate: PolicyOption
@@ -134,6 +122,7 @@ class Recommendations(BaseModel):
     public_transport: list[Recommendation]
     walkability: list[Recommendation]
     policy_enforcement: list[Recommendation]
+    affected_groups: list[Recommendation] = []
 
 
 class SituationMetrics(BaseModel):
@@ -142,6 +131,7 @@ class SituationMetrics(BaseModel):
     accident_risk: Literal["Low", "Moderate", "High", "Critical"]
     estimated_affected_commuters: int
     congestion_description: str
+    inferred_affected_groups: list[str] = []   # e.g. ["Commuters", "School children"]
 
 
 class BudgetEstimates(BaseModel):
@@ -149,6 +139,7 @@ class BudgetEstimates(BaseModel):
     public_transport: float
     walkability: float
     policy_enforcement: float
+    affected_groups: float = 0.0
     total: float
 
 
@@ -180,6 +171,7 @@ class AnalysisResponse(BaseModel):
     warnings: list[str] = []
     has_edited_costs: bool = False
     deferred_recommendations: list[DeferredRecommendation] = []
+    additional_context_used: bool = True
 
 
 class ReportRequest(BaseModel):

@@ -14,16 +14,18 @@ const CATEGORY_COLORS: Record<RecommendationCategory, string> = {
   public_transport: "#2563EB",
   walkability: "#16A34A",
   policy_enforcement: "#D97706",
+  affected_groups: "#7C3AED",
 };
 
-// CATEGORY_LABELS used in TimelineChart only
+// CATEGORY_LABELS used in GanttChart
 const CATEGORY_LABELS: Record<RecommendationCategory, string> = {
   traffic_flow: "Traffic Flow",
   public_transport: "Public Transport",
   walkability: "Walkability",
   policy_enforcement: "Policy",
+  affected_groups: "Affected Groups",
 } as const;
-void CATEGORY_LABELS; // suppress unused warning — used in ganttData.cat
+void CATEGORY_LABELS;
 
 const RISK_COLORS: Record<AccidentRisk, string> = {
   Low: "#16A34A",
@@ -145,6 +147,31 @@ function SituationSection({ analysis }: { analysis: AnalysisResponse }) {
           <StatCard label="Accident Risk / Risiko Kemalangan" value={m.accident_risk} sub="current conditions" color={RISK_COLORS[m.accident_risk]} />
           <StatCard label="Affected Commuters / Pengguna Terjejas" value={m.estimated_affected_commuters.toLocaleString()} sub="estimated daily" color="#2563EB" />
         </div>
+
+        {/* Inferred Affected Groups pills */}
+        {m.inferred_affected_groups && m.inferred_affected_groups.length > 0 && (
+          <div>
+            <div style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "#6B7280", marginBottom: "6px" }}>
+              Kumpulan Terjejas / Affected Groups
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.375rem" }}>
+              {m.inferred_affected_groups.map((group) => (
+                <span key={group} style={{
+                  display: "inline-block",
+                  padding: "3px 10px",
+                  borderRadius: "9999px",
+                  fontSize: "0.75rem",
+                  fontWeight: 600,
+                  backgroundColor: "#F5F3FF",
+                  color: "#7C3AED",
+                  border: "1px solid #DDD6FE",
+                }}>
+                  {group}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </Card>
   );
@@ -159,6 +186,7 @@ function CategoryBarChart({ analysis, editedRecs }: { analysis: AnalysisResponse
     { key: "public_transport", name: "Public Transport" },
     { key: "walkability", name: "Walkability" },
     { key: "policy_enforcement", name: "Policy" },
+    { key: "affected_groups", name: "Affected Groups" },
   ];
 
   // Count from editedRecs if available, else fall back to analysis — exclude deferred
@@ -211,7 +239,8 @@ function BudgetChart({ analysis, editedRecs }: { analysis: AnalysisResponse; edi
     const pt = calc("public_transport");
     const wk = calc("walkability");
     const pe = calc("policy_enforcement");
-    return { traffic_flow: tf, public_transport: pt, walkability: wk, policy_enforcement: pe, total: tf + pt + wk + pe };
+    const ag = calc("affected_groups");
+    return { traffic_flow: tf, public_transport: pt, walkability: wk, policy_enforcement: pe, affected_groups: ag, total: tf + pt + wk + pe + ag };
   }, [editedRecs, analysis.budget_estimates]);
 
   const data = [
@@ -219,6 +248,7 @@ function BudgetChart({ analysis, editedRecs }: { analysis: AnalysisResponse; edi
     { name: "Public Transport", amount: liveBudget.public_transport, fill: CATEGORY_COLORS.public_transport },
     { name: "Walkability", amount: liveBudget.walkability, fill: CATEGORY_COLORS.walkability },
     { name: "Policy", amount: liveBudget.policy_enforcement, fill: CATEGORY_COLORS.policy_enforcement },
+    { name: "Affected Groups", amount: liveBudget.affected_groups ?? 0, fill: CATEGORY_COLORS.affected_groups },
   ];
 
   const top = data.reduce((a, c) => (a.amount >= c.amount ? a : c));
@@ -276,7 +306,7 @@ function classifyItem(action: string, category: RecommendationCategory, priority
 }
 
 function buildGanttItems(analysis: AnalysisResponse): GanttItem[] {
-  const cats: RecommendationCategory[] = ["traffic_flow", "public_transport", "walkability", "policy_enforcement"];
+  const cats: RecommendationCategory[] = ["traffic_flow", "public_transport", "walkability", "policy_enforcement", "affected_groups"];
   const allRecs: { rec: typeof analysis.recommendations.traffic_flow[0]; cat: RecommendationCategory }[] = [];
   for (const cat of cats) {
     for (const rec of analysis.recommendations[cat]) {
@@ -596,7 +626,13 @@ interface AnalyticsDashboardProps {
 
 export default function AnalyticsDashboard({ analysis, editedRecs }: AnalyticsDashboardProps) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" , minWidth: 0, width: "100%", overflow: "hidden"}}>
+    <div style={{ 
+      display: "flex", 
+      flexDirection: "column", 
+      gap: "1rem" , 
+      minWidth: 0, 
+      width: "100%", 
+      overflow: "hidden"}}>
       {/* Section 1 — Current Situation */}
       <SituationSection analysis={analysis} />
 

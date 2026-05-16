@@ -12,6 +12,7 @@ interface UseAnalysisReturn {
   analyze: (payload: AnalyzeRequest) => Promise<void>;
   lastBudgetRange: string | null;
   lastExactBudget: number | null;
+  lastAdditionalContext: string | null;
 }
 
 export function useAnalysis(): UseAnalysisReturn {
@@ -20,12 +21,14 @@ export function useAnalysis(): UseAnalysisReturn {
   const [error, setError] = useState<string | null>(null);
   const [lastBudgetRange, setLastBudgetRange] = useState<string | null>(null);
   const [lastExactBudget, setLastExactBudget] = useState<number | null>(null);
+  const [lastAdditionalContext, setLastAdditionalContext] = useState<string | null>(null);
 
   const analyze = useCallback(async (payload: AnalyzeRequest): Promise<void> => {
     setIsLoading(true);
     setError(null);
     setLastBudgetRange(payload.budget_range);
     setLastExactBudget(payload.exact_budget ?? null);
+    setLastAdditionalContext(payload.additional_context ?? "");
 
     try {
       const response = await fetch(`${API_URL}/analyze`, {
@@ -58,5 +61,5 @@ export function useAnalysis(): UseAnalysisReturn {
     }
   }, []);
 
-  return { analysis, isLoading, error, analyze, lastBudgetRange, lastExactBudget };
+  return { analysis, isLoading, error, analyze, lastBudgetRange, lastExactBudget, lastAdditionalContext };
 }
