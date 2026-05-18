@@ -376,6 +376,17 @@ def _build_recommendations_table(
         ]))
         elements.append(rec_tbl)
 
+        # Expected impact line (if available)
+        impact = getattr(rec, 'expected_impact', '') or ''
+        if impact.strip():
+            elements.append(Paragraph(
+                f"<i>Expected Impact / Impak Dijangka: {impact}</i>",
+                ParagraphStyle("ImpactLine", parent=styles["body"], fontSize=8,
+                               textColor=colors.HexColor("#4B5563"),
+                               fontName="Helvetica-Oblique", spaceBefore=2, spaceAfter=2,
+                               leftIndent=5),
+            ))
+
         # Cost breakdown table (if available)
         breakdown = getattr(rec, 'cost_breakdown', [])
         if breakdown:

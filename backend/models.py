@@ -114,6 +114,7 @@ class Recommendation(BaseModel):
     priority_level: PriorityLevel
     estimated_cost: int = 0
     rationale: str = ""
+    expected_impact: str = ""   # short qualitative impact, max ~10 words
     cost_breakdown: list[CostBreakdownItem] = []
 
 

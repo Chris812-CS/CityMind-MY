@@ -311,7 +311,7 @@ function DetailPanel({
 
   return (
     <tr>
-      <td colSpan={8} style={{ padding: 0, backgroundColor: "#F8FAFC" }}>
+      <td colSpan={9} style={{ padding: 0, backgroundColor: "#F8FAFC" }}>
         <div style={{
           padding: "1rem 1.25rem",
           borderLeft: `4px solid ${PRIORITY_COLORS[rec.priority_level]}`,
@@ -344,6 +344,28 @@ function DetailPanel({
               </div>
               <div style={{ fontSize: "0.875rem", color: "#111827" }}>{rec.estimated_timeline}</div>
             </div>
+            {rec.expected_impact && (
+              <div style={{ gridColumn: "1 / -1" }}>
+                <div style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "0.25rem" }}>
+                  Expected Impact / Impak Dijangka
+                </div>
+                <div style={{
+                  fontSize: "0.875rem",
+                  color: "#1E40AF",
+                  fontStyle: "italic",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.375rem",
+                  backgroundColor: "#EFF6FF",
+                  border: "1px solid #BFDBFE",
+                  borderRadius: "0.375rem",
+                  padding: "0.25rem 0.625rem",
+                }}>
+                  <span>⚡</span>
+                  <span>{rec.expected_impact}</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {rec.cost_breakdown.length > 0 && (
@@ -618,6 +640,7 @@ export default function RecommendationPanel({
               <th style={thStyle}>Action</th>
               <th style={{ ...thStyle, width: "110px" }}>Owner</th>
               <th style={{ ...thStyle, width: "80px" }}>Timeline</th>
+              <th style={{ ...thStyle, width: "140px" }}>Expected Impact</th>
               <th style={{ ...thStyle, width: "90px" }}>Est. Cost</th>
               <th style={{ ...thStyle, width: "80px" }}>Status</th>
               <th style={{ ...thStyle, width: "24px" }} />
@@ -626,7 +649,7 @@ export default function RecommendationPanel({
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={9} style={{ padding: "2rem", textAlign: "center", color: "#9CA3AF", fontSize: "0.875rem", fontStyle: "italic" }}>
+                <td colSpan={10} style={{ padding: "2rem", textAlign: "center", color: "#9CA3AF", fontSize: "0.875rem", fontStyle: "italic" }}>
                   No recommendations match this filter.
                 </td>
               </tr>
@@ -678,6 +701,11 @@ export default function RecommendationPanel({
                     </td>
                     <td style={{ ...tdStyle, fontSize: "0.75rem", whiteSpace: "nowrap" }} onClick={() => setExpandedIdx(isExpanded ? null : rec.implOrder)}>
                       {rec.estimated_timeline}
+                    </td>
+                    <td style={{ ...tdStyle, fontSize: "0.6875rem", fontStyle: "italic", color: isDeferred ? "#9CA3AF" : "#6B7280", maxWidth: "140px" }} onClick={() => setExpandedIdx(isExpanded ? null : rec.implOrder)}>
+                      {rec.expected_impact
+                        ? <span title={rec.expected_impact} style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{rec.expected_impact}</span>
+                        : <span style={{ color: "#D1D5DB" }}>—</span>}
                     </td>
                     <td style={{ ...tdStyle, fontSize: "0.75rem", fontWeight: 600, color: isDeferred ? "#9CA3AF" : (rec.isEdited ? "#D97706" : "#1E3A5F"), whiteSpace: "nowrap" }} onClick={() => setExpandedIdx(isExpanded ? null : rec.implOrder)}>
                       {isDeferred

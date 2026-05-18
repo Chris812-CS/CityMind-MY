@@ -98,6 +98,7 @@ export interface Recommendation {
   estimated_cost: number;
   rationale: string;
   cost_breakdown: CostBreakdownItem[];
+  expected_impact: string;  // short qualitative impact, max ~10 words
 }
 
 export interface Recommendations {

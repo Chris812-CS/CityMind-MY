@@ -41,11 +41,12 @@ const SCHOOL_ICON    = makeEmojiIcon("🏫", 30);
 const COMMERCIAL_ICON = makeEmojiIcon("🏬", 30);
 const HOTSPOT_ICON   = makeEmojiIcon("⚠️", 32, true);   // pulsing
 const BUS_STOP_ICON  = makeEmojiIcon("🚌", 30);
+const OKU_ICON = makeEmojiIcon("♿", 30);
 
 // ---------------------------------------------------------------------------
 // Landmark data
 // ---------------------------------------------------------------------------
-type LandmarkCategory = "school" | "commercial" | "accident_hotspot" | "bus_stop";
+type LandmarkCategory = "school" | "commercial" | "accident_hotspot" | "bus_stop" | "oku_facility";
 
 interface Landmark {
   name: string;
@@ -56,25 +57,28 @@ interface Landmark {
 
 const LANDMARKS: Record<string, Landmark[]> = {
   Puchong: [
-    { name: "SJK(C) Han Ming", category: "school", coordinates: [3.0280, 101.6150], note: "Primary school — school zone active 7–8am and 1–2pm" },
-    { name: "SMK Puchong Permai", category: "school", coordinates: [3.0350, 101.6220], note: "Secondary school — contributes to morning peak congestion" },
-    { name: "SMK Puchong", category: "school", coordinates: [3.0300, 101.6180], note: "Secondary school — school zone on Jalan Puchong" },
+    { name: "SJK(C) Han Ming", category: "school", coordinates: [2.9967, 101.6232], note: "Primary school at Batu 14, Jalan Puchong — school zone active 7–8am and 1–2pm" },
+    { name: "SMK Puchong", category: "school", coordinates: [2.9978, 101.6231], note: "Secondary school at Batu 14, Jalan Puchong — school zone on main corridor" },
+    { name: "SMK Puchong Permai", category: "school", coordinates: [2.9950, 101.5958], note: "Secondary school — students commute via Jalan Puchong daily" },
     { name: "IOI Mall Puchong", category: "commercial", coordinates: [3.0180, 101.6280], note: "Major retail hub — high weekend traffic generator" },
     { name: "Setia Walk", category: "commercial", coordinates: [3.0250, 101.6200], note: "Commercial strip — peak activity evenings and weekends" },
     { name: "Tesco Extra Puchong", category: "commercial", coordinates: [3.0320, 101.6150], note: "Hypermarket — delivery lorry traffic congestion point" },
     { name: "Giant IOI Bandar Puteri", category: "commercial", coordinates: [3.0150, 101.6300], note: "Supermarket — contributes to Bandar Puteri junction congestion" },
+    { name: "Ahsana OKU Center (PKAKL)", category: "oku_facility", coordinates: [3.0489, 101.6612], note: "Registered NGO under JKM housing 14 OKU children. No OKU-friendly pedestrian access on Jalan Puchong corridor connecting to this facility." },
     { name: "Puchong Perdana Junction", category: "accident_hotspot", coordinates: [3.0280, 101.6180], note: "Known accident blackspot — multiple recorded crashes. Critical congestion zone." },
-    { name: "Puchong Utama Junction", category: "accident_hotspot", coordinates: [3.0340, 101.6210], note: "Known accident blackspot — critical congestion. Hit-and-run Sep 2025." },
-    { name: "Jalan Puchong/LDP Intersection (MTree Hotel)", category: "accident_hotspot", coordinates: [3.0200, 101.6250], note: "Known accident blackspot — 3 vehicles rammed at 12:30am May 2025." },
-    { name: "Batu 14 Guardrail Crash Site", category: "accident_hotspot", coordinates: [3.0150, 101.6100], note: "Fatal crash Oct 2025 — Perodua Bezza impaled by road divider, 1 killed." },
+    { name: "Puchong Utama Junction (Hit-and-run Sep 2025)", category: "accident_hotspot", coordinates: [3.0340, 101.6210], note: "Hit-and-run Sep 2025 — motorcyclist struck by Honda BRV, driver fled." },
+    { name: "Jalan Puchong/LDP Intersection (MTree Hotel)", category: "accident_hotspot", coordinates: [3.0200, 101.6250], note: "3 vehicles rammed at 12:30am May 2025." },
+    { name: "Batu 14 — Fatal Crash Oct 2025", category: "accident_hotspot", coordinates: [2.9967, 101.6232], note: "Perodua Bezza impaled by road divider, 1 killed, 2 injured." },
+    { name: "Caltex — Fatal Motorcycle Crash 8 May 2026", category: "accident_hotspot", coordinates: [3.0445, 101.6631], note: "Fatal motorcycle crash — blocked right lane, congestion from Bloomsvale to Taman Kinrara." },
     { name: "Jalan Puchong Puteri 2/7 Traffic Lights", category: "accident_hotspot", coordinates: [3.0310, 101.6190], note: "Hit-and-run Mar 2026 — red light runner fled scene at 8pm." },
+    { name: "Bandar Puteri Junction", category: "accident_hotspot", coordinates: [3.0312, 101.6701], note: "8-vehicle pileup Jan 2026 — lorry brake failure, 7 stationary cars hit." },
   ],
   "Kuala Lumpur": [
-    { name: "NPE Flyover Merging Zone", category: "accident_hotspot", coordinates: [3.1090, 101.6410], note: "Accident blackspot — tour bus hit-and-run Apr 2026, frequent lane-merge crashes off NPE ramps" },
-    { name: "Jalan Othman Intersection", category: "accident_hotspot", coordinates: [3.1060, 101.6370], note: "High-risk junction — car and bike burst into flames May 2024, red-light runner incident" },
-    { name: "PJ Old Town Curve", category: "accident_hotspot", coordinates: [3.1045, 101.6355], note: "Illegal parking narrows lanes from 2 to 1, frequent evasive braking crashes" },
-    { name: "Jalan Templer / Jalan Gasing Junction", category: "school", coordinates: [3.1073, 101.6389], note: "Major arterial junction — 260,000 vehicles/day, MBPJ contraflow 5–7pm weekdays" },
-    { name: "Jalan Othman Traffic Light", category: "school", coordinates: [3.1060, 101.6370], note: "Former roundabout converted to traffic lights — increased throughput by 50%" },
+    { name: "NPE Flyover Merging Zone", category: "accident_hotspot", coordinates: [3.1090, 101.6410], note: "Tour bus hit-and-run Apr 2026, car-motorcycle sideswipe May 2026. Vehicles decelerate rapidly off NPE ramps." },
+    { name: "Jalan Othman Intersection", category: "accident_hotspot", coordinates: [3.1060, 101.6370], note: "Fatal junction fire May 2024 — Honda Accord and Yamaha burst into flames. Red-light runner zone." },
+    { name: "PJ Old Town Curve", category: "accident_hotspot", coordinates: [3.1045, 101.6355], note: "Illegal parking narrows lanes from 2 to 1, forcing sudden evasive braking crashes." },
+    { name: "PJ Old Town Bus Terminal", category: "oku_facility", coordinates: [3.1034, 101.6521], note: "Reconstructed at RM3.9mil with OKU parking bays and barrier-free walkways. Connecting pedestrian path from Jalan Templer lacks tactile paving." },
+    { name: "Jalan Templer / Jalan Gasing Junction", category: "commercial", coordinates: [3.1073, 101.6389], note: "Major arterial junction — 260,000 vehicles/day, MBPJ contraflow 5–7pm weekdays." },
   ],
 };
 
@@ -83,6 +87,7 @@ const LANDMARK_ICONS: Record<LandmarkCategory, L.DivIcon> = {
   commercial: COMMERCIAL_ICON,
   accident_hotspot: HOTSPOT_ICON,
   bus_stop: BUS_STOP_ICON,
+  oku_facility: OKU_ICON,
 };
 
 const LANDMARK_EMOJI: Record<LandmarkCategory, string> = {
@@ -90,6 +95,7 @@ const LANDMARK_EMOJI: Record<LandmarkCategory, string> = {
   commercial: "🏬",
   accident_hotspot: "⚠️",
   bus_stop: "🚌",
+  oku_facility: "♿",
 };
 
 const LANDMARK_LABEL: Record<LandmarkCategory, string> = {
@@ -97,6 +103,7 @@ const LANDMARK_LABEL: Record<LandmarkCategory, string> = {
   commercial: "Commercial",
   accident_hotspot: "Accident Hotspot",
   bus_stop: "Bus Stop",
+  oku_facility: "OKU Facility",
 };
 
 // ---------------------------------------------------------------------------
@@ -198,7 +205,7 @@ function MapLegend({ showLandmarks }: { showLandmarks: boolean }) {
           <div style={{ fontWeight: 800, marginTop: "8px", marginBottom: "4px", color: "#1E3A5F", fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
             Landmarks
           </div>
-          {(["school", "commercial", "accident_hotspot"] as LandmarkCategory[]).map((cat) => (
+          {(["school", "commercial", "accident_hotspot", "oku_facility"] as LandmarkCategory[]).map((cat) => (
             <div key={cat} style={{ display: "flex", alignItems: "center", gap: "5px" }}>
               <span style={{ fontSize: "14px", lineHeight: 1 }}>{LANDMARK_EMOJI[cat]}</span>
               <span style={{ color: "#374151", fontSize: "10px" }}>{LANDMARK_LABEL[cat]}</span>

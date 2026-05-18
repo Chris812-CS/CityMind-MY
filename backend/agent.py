@@ -251,6 +251,7 @@ Affected Groups recommendations guidance:
 Cost breakdown guidance per recommendation:
 - estimated_cost: total RM cost for this single recommendation (integer)
 - rationale: 1-2 sentences explaining why this action is needed, citing verified data
+- expected_impact: a short qualitative impact statement, maximum 10 words. Derive from the rationale. Examples: "Reduces congestion by ~20% at peak hours", "Saves 10 min/commuter/day", "Reduces accident risk at junction", "Improves pedestrian safety near school zone", "Cuts illegal parking incidents by half". Be specific and measurable where possible.
 - cost_breakdown: itemised list of 2-5 line items. Each item: item name, unit, qty (integer), unit_cost (integer RM), total (= qty * unit_cost).
 - total in each breakdown item must equal qty * unit_cost exactly
 - estimated_cost must equal sum of all breakdown item totals
@@ -290,11 +291,11 @@ The JSON schema is:
     "inferred_affected_groups": ["Commuters", "School children"]
   },
   "recommendations": {
-    "traffic_flow": [{"action": "string", "responsible_party": "string", "estimated_timeline": "string", "priority_level": "Critical", "estimated_cost": 0, "rationale": "string", "cost_breakdown": [{"item": "string", "unit": "string", "qty": 0, "unit_cost": 0, "total": 0}]}],
-    "public_transport": [],
-    "walkability": [],
-    "policy_enforcement": [],
-    "affected_groups": []
+    "traffic_flow": [{"action": "string", "responsible_party": "string", "estimated_timeline": "string", "priority_level": "Critical", "estimated_cost": 0, "rationale": "string", "expected_impact": "string", "cost_breakdown": [{"item": "string", "unit": "string", "qty": 0, "unit_cost": 0, "total": 0}]}],
+    "public_transport": [{"action": "string", "responsible_party": "string", "estimated_timeline": "string", "priority_level": "High", "estimated_cost": 0, "rationale": "string", "expected_impact": "string", "cost_breakdown": [{"item": "string", "unit": "string", "qty": 0, "unit_cost": 0, "total": 0}]}],
+    "walkability": [{"action": "string", "responsible_party": "string", "estimated_timeline": "string", "priority_level": "Medium", "estimated_cost": 0, "rationale": "string", "expected_impact": "string", "cost_breakdown": [{"item": "string", "unit": "string", "qty": 0, "unit_cost": 0, "total": 0}]}],
+    "policy_enforcement": [{"action": "string", "responsible_party": "string", "estimated_timeline": "string", "priority_level": "High", "estimated_cost": 0, "rationale": "string", "expected_impact": "string", "cost_breakdown": [{"item": "string", "unit": "string", "qty": 0, "unit_cost": 0, "total": 0}]}],
+    "affected_groups": [{"action": "string", "responsible_party": "string", "estimated_timeline": "string", "priority_level": "Medium", "estimated_cost": 0, "rationale": "string", "expected_impact": "string", "cost_breakdown": [{"item": "string", "unit": "string", "qty": 0, "unit_cost": 0, "total": 0}]}]
   },
   "budget_estimates": {"traffic_flow": 0, "public_transport": 0, "walkability": 0, "policy_enforcement": 0, "affected_groups": 0, "total": 0},
   "budget_total": 0,
@@ -423,9 +424,14 @@ def _post_validate_and_fix(validated: AnalysisResponse) -> AnalysisResponse:
         + validated.recommendations.public_transport
         + validated.recommendations.walkability
         + validated.recommendations.policy_enforcement
+        + validated.recommendations.affected_groups
     )
 
     for rec in all_recs:
+        # Ensure expected_impact is never None
+        if not rec.expected_impact:
+            rec.expected_impact = ""
+
         if rec.cost_breakdown:
             breakdown_sum = sum(item.total for item in rec.cost_breakdown)
             if int(breakdown_sum) != rec.estimated_cost:
@@ -438,12 +444,14 @@ def _post_validate_and_fix(validated: AnalysisResponse) -> AnalysisResponse:
     pt_total = sum(r.estimated_cost for r in validated.recommendations.public_transport)
     wk_total = sum(r.estimated_cost for r in validated.recommendations.walkability)
     pe_total = sum(r.estimated_cost for r in validated.recommendations.policy_enforcement)
-    grand_total = tf_total + pt_total + wk_total + pe_total
+    ag_total = sum(r.estimated_cost for r in validated.recommendations.affected_groups)
+    grand_total = tf_total + pt_total + wk_total + pe_total + ag_total
 
     validated.budget_estimates.traffic_flow = float(tf_total)
     validated.budget_estimates.public_transport = float(pt_total)
     validated.budget_estimates.walkability = float(wk_total)
     validated.budget_estimates.policy_enforcement = float(pe_total)
+    validated.budget_estimates.affected_groups = float(ag_total)
     validated.budget_estimates.total = float(grand_total)
     validated.budget_total = grand_total
 
