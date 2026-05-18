@@ -60,6 +60,16 @@ FLOOD RISK (verified): Flash floods during evening downpours cause slick surface
 
 EXISTING ISSUES: Illegal parking near commercial lots, single-lane bottleneck sections at key junctions.
 
+NEARBY OKU FACILITY (verified):
+- Ahsana OKU Center (Persatuan Kebajikan Ahsana KL / PKAKL)
+  Address: No. 2, Jalan 4/153A, Off Jalan Puchong, Taman Puchong Indah
+  Registered NGO under JKM housing 14 OKU children (autism, Down syndrome,
+  cerebral palsy, physical disability)
+  Accessibility gap: no OKU-friendly pedestrian access on Jalan Puchong
+  corridor connecting to this facility
+  When relevant: recommend accessible pedestrian crossings, tactile paving,
+  and OKU-friendly bus stops near Taman Puchong Indah junction
+
 SITUATION METRICS GUIDANCE for Jalan Puchong:
 - estimated_affected_commuters: use 100000 as daily base; scale by time period (peak = 60000-80000, off-peak = 20000-30000)
 - congestion_description: reference specific junctions (Batu 14, Jalan Puchong Utama, Bandar Puteri, OUG/Kinrara, MTree Hotel intersection)
@@ -105,6 +115,20 @@ KNOWN PROBLEMS (verified):
 - Evening contraflow creates confusion for unfamiliar drivers
 
 NEARBY LANDMARKS: PJ Old Town commercial area, New Pantai Expressway (NPE) intersection, Jalan Othman market area, Jalan Gasing arterial junction
+
+NEARBY OKU FACILITY & ACCESSIBILITY (verified):
+- Petaling Jaya Old Town Bus Terminal at Jalan Othman
+  (directly connected to Jalan Templer):
+  Reconstructed at RM3.9mil with OKU parking bays,
+  barrier-free walkways and OKU-friendly washrooms
+  Accessibility gap: connecting pedestrian path from Jalan Templer
+  to bus terminal lacks tactile paving and accessible crossing
+  at PJ Old Town Curve
+- MBPJ provides PWD Transit Van for hospital/clinic appointments —
+  boarding points near Jalan Templer require accessible kerb cuts
+  and waiting shelters
+  When relevant: recommend accessible pedestrian crossings, tactile
+  paving, and OKU kerb cuts near Jalan Othman junction and PJ Old Town Curve
 
 SITUATION METRICS GUIDANCE for Jalan Templer:
 - estimated_affected_commuters: use 260000 as daily base (verified: billboard operator data); scale by time period (peak = 150000-200000, off-peak = 50000-80000)
