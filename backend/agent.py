@@ -15,7 +15,6 @@ bedrock_model = BedrockModel(
     model_id="arn:aws:bedrock:ap-southeast-2:110080809978:application-inference-profile/hj4ql7rcdm5c",
     region_name="ap-southeast-2",
     temperature=0.3,
-    api_key=os.environ.get("BEDROCK_API_KEY"),
 )
 
 SYSTEM_PROMPT = """
