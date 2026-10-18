@@ -12,8 +12,8 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env.loca
 logger = logging.getLogger(__name__)
 
 bedrock_model = BedrockModel(
-    model_id="arn:aws:bedrock:ap-southeast-2:110080809978:application-inference-profile/hj4ql7rcdm5c",
-    region_name="ap-southeast-2",
+    model_id="global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+    region_name="ap-southeast-5",   # the region your key was created in
     temperature=0.3,
 )
 
