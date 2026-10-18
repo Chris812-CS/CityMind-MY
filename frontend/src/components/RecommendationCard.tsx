@@ -47,11 +47,11 @@ export default function RecommendationCard({
       {/* Meta row */}
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
         <span>
-          <span className="font-semibold">Pihak Bertanggungjawab / Party: </span>
+          <span className="font-semibold">Party: </span>
           {responsible_party}
         </span>
         <span>
-          <span className="font-semibold">Tempoh / Timeline: </span>
+          <span className="font-semibold">Timeline: </span>
           {estimated_timeline}
         </span>
       </div>

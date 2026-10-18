@@ -134,7 +134,7 @@ function SituationSection({ analysis }: { analysis: AnalysisResponse }) {
   const m = analysis.situation_metrics;
   return (
     <Card>
-      <SectionTitle>Situasi Semasa / Current Situation</SectionTitle>
+      <SectionTitle>Current Situation</SectionTitle>
       <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
           <SeverityBadge score={m.severity_score} />
@@ -143,16 +143,16 @@ function SituationSection({ analysis }: { analysis: AnalysisResponse }) {
           </p>
         </div>
         <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-          <StatCard label="Time Wasted / Masa Terbuang" value={`${m.daily_time_wasted_minutes} min`} sub="per commuter daily" color="#D97706" />
-          <StatCard label="Accident Risk / Risiko Kemalangan" value={m.accident_risk} sub="current conditions" color={RISK_COLORS[m.accident_risk]} />
-          <StatCard label="Affected Commuters / Pengguna Terjejas" value={m.estimated_affected_commuters.toLocaleString()} sub="estimated daily" color="#2563EB" />
+          <StatCard label="Time Wasted" value={`${m.daily_time_wasted_minutes} min`} sub="per commuter daily" color="#D97706" />
+          <StatCard label="Accident Risk" value={m.accident_risk} sub="current conditions" color={RISK_COLORS[m.accident_risk]} />
+          <StatCard label="Affected Commuters" value={m.estimated_affected_commuters.toLocaleString()} sub="estimated daily" color="#2563EB" />
         </div>
 
         {/* Inferred Affected Groups pills */}
         {m.inferred_affected_groups && m.inferred_affected_groups.length > 0 && (
           <div>
             <div style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "#6B7280", marginBottom: "6px" }}>
-              Kumpulan Terjejas / Affected Groups
+              Affected Groups
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.375rem" }}>
               {m.inferred_affected_groups.map((group) => (
@@ -202,7 +202,7 @@ function CategoryBarChart({ analysis, editedRecs }: { analysis: AnalysisResponse
 
   return (
     <Card>
-      <SectionTitle>Recommendations by Category / Cadangan mengikut Kategori</SectionTitle>
+      <SectionTitle>Recommendations by Category</SectionTitle>
       <ResponsiveContainer width="100%" height={200}>
         <BarChart data={data} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
@@ -216,7 +216,6 @@ function CategoryBarChart({ analysis, editedRecs }: { analysis: AnalysisResponse
       </ResponsiveContainer>
       <p style={summaryStyle}>
         Highest focus area: <strong>{top.name}</strong> — Total: {total} recommendations across 4 categories<br />
-        <em>Fokus tertinggi: {top.name} — Jumlah: {total} cadangan merentasi 4 kategori</em>
       </p>
     </Card>
   );
@@ -255,7 +254,7 @@ function BudgetChart({ analysis, editedRecs }: { analysis: AnalysisResponse; edi
 
   return (
     <Card>
-      <SectionTitle>Budget Allocation / Peruntukan Bajet</SectionTitle>
+      <SectionTitle>Budget Allocation</SectionTitle>
       <ResponsiveContainer width="100%" height={200}>
         <BarChart data={data} margin={{ top: 4, right: 8, left: 8, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
@@ -269,7 +268,6 @@ function BudgetChart({ analysis, editedRecs }: { analysis: AnalysisResponse; edi
       </ResponsiveContainer>
       <p style={summaryStyle}>
         Largest allocation: <strong>{top.name}</strong> at {fmtRM(top.amount)} — Total estimated budget: {fmtRM(liveBudget.total)}<br />
-        <em>Peruntukan terbesar: {top.name} pada {fmtRM(top.amount)} — Jumlah anggaran bajet: {fmtRM(liveBudget.total)}</em>
       </p>
     </Card>
   );
@@ -435,7 +433,7 @@ function GanttChart({ analysis, editedRecs }: { analysis: AnalysisResponse; edit
 
   return (
     <Card style={{ minWidth: 0, overflow: "hidden" }}>
-      <SectionTitle>Implementation Timeline / Jadual Pelaksanaan (Month-Based)</SectionTitle>
+      <SectionTitle>Implementation Timeline (Month-Based)</SectionTitle>
 
       {/* Scrollable container — fixed width, never overflows page */}
       <div style={{
@@ -596,7 +594,7 @@ function GanttChart({ analysis, editedRecs }: { analysis: AnalysisResponse; edit
                   fontStyle: "italic",
                 }}
               >
-                Bulan / Month
+                Month
               </td>
             </tr>
           </tbody>

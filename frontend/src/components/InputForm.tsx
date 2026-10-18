@@ -55,7 +55,7 @@ const BUDGET_RANGES: BudgetRange[] = [
   "RM200k-500k",
   "RM500k-1mil",
   "Above RM1mil",
-  "Custom / Lain-lain",
+  "Custom",
 ];
 
 const POLICY_OPTIONS: PolicyOption[] = [
@@ -170,7 +170,7 @@ export default function InputForm({ onSubmit, isLoading, onLocationChange }: Inp
     if (!timePeriod) e.timePeriod = "Sila pilih tempoh masa / Please select time period";
     if (!dayType) e.dayType = "Sila pilih jenis hari / Please select day type";
     if (!budgetRange) e.budgetRange = "Sila pilih julat bajet / Please select budget range";
-    if (budgetRange === "Custom / Lain-lain" && !exactBudget.trim()) {
+    if (budgetRange === "Custom" && !exactBudget.trim()) {
       e.exactBudget = "Sila masukkan bajet tepat / Please enter exact budget";
     }
     if (exactBudget.trim()) {
@@ -233,22 +233,22 @@ export default function InputForm({ onSubmit, isLoading, onLocationChange }: Inp
 
       {/* ── STEP 1: LOCATION ── */}
       <div style={sectionStyle}>
-        <p style={stepHeadingStyle}>Langkah 1 / Step 1 — Lokasi / Location</p>
+        <p style={stepHeadingStyle}>Step 1 — Location</p>
 
         <div style={fieldStyle}>
-          <label style={labelStyle}>Negeri / State</label>
+          <label style={labelStyle}>State</label>
           <div style={{ ...selectStyle, backgroundColor: "#F3F4F6", color: "#6B7280", cursor: "not-allowed" }}>
-            {city ? CITY_MAP_CONFIG[city as City].state : "— pilih daerah dahulu / select city first —"}
+            {city ? CITY_MAP_CONFIG[city as City].state : "— Select city first —"}
           </div>
         </div>
 
         <div style={fieldStyle}>
           <label htmlFor="city" style={labelStyle}>
-            Daerah / City <span style={{ color: "#DC2626" }}>*</span>
+            City <span style={{ color: "#DC2626" }}>*</span>
           </label>
           <select id="city" value={city} onChange={(e) => handleCityChange(e.target.value)}
             style={errors.city ? errorSelectStyle : selectStyle}>
-            <option value="">-- Pilih daerah / Select city --</option>
+            <option value="">-- Select city --</option>
             {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
           {errors.city && <p style={errorTextStyle}>{errors.city}</p>}
@@ -256,13 +256,13 @@ export default function InputForm({ onSubmit, isLoading, onLocationChange }: Inp
 
         <div style={fieldStyle}>
           <label htmlFor="street" style={labelStyle}>
-            Jalan / Street <span style={{ color: "#DC2626" }}>*</span>
+            Street <span style={{ color: "#DC2626" }}>*</span>
           </label>
           <select id="street" value={street}
             onChange={(e) => { setStreet(e.target.value); setErrors((prev) => ({ ...prev, street: "" })); }}
             disabled={!city}
             style={errors.street ? errorSelectStyle : { ...selectStyle, color: !city ? "#9CA3AF" : "#111827" }}>
-            <option value="">{city ? "-- Pilih jalan / Select street --" : "-- Pilih daerah dahulu --"}</option>
+            <option value="">{city ? "-- Select street --" : "-- Select Street First --"}</option>
             {streets.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
           {errors.street && <p style={errorTextStyle}>{errors.street}</p>}
@@ -271,17 +271,17 @@ export default function InputForm({ onSubmit, isLoading, onLocationChange }: Inp
 
       {/* ── STEP 2: SITUATION ── */}
       <div style={sectionStyle}>
-        <p style={stepHeadingStyle}>Langkah 2 / Step 2 — Situasi / Situation</p>
+        <p style={stepHeadingStyle}>Step 2 — Situation</p>
 
         {/* 1. Traffic Level */}
         <div style={fieldStyle}>
           <label htmlFor="traffic-level" style={labelStyle}>
-            Tahap Trafik / Traffic Level <span style={{ color: "#DC2626" }}>*</span>
+            Traffic Level <span style={{ color: "#DC2626" }}>*</span>
           </label>
           <select id="traffic-level" value={trafficLevel}
             onChange={(e) => { setTrafficLevel(e.target.value as TrafficLevel); setErrors((prev) => ({ ...prev, trafficLevel: "" })); }}
             style={errors.trafficLevel ? errorSelectStyle : selectStyle}>
-            <option value="">-- Pilih tahap / Select level --</option>
+            <option value="">-- Select level --</option>
             {TRAFFIC_LEVELS.map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
           {errors.trafficLevel && <p style={errorTextStyle}>{errors.trafficLevel}</p>}
@@ -290,8 +290,8 @@ export default function InputForm({ onSubmit, isLoading, onLocationChange }: Inp
         {/* 2. Transport Problems — multi-select chips, max 3 */}
         <div style={fieldStyle}>
           <label style={labelStyle}>
-            Masalah Pengangkutan / Transport Problems <span style={{ color: "#DC2626" }}>*</span>
-            <span style={{ display: "block", fontWeight: 400, color: "#6B7280", marginTop: "0.125rem" }}>(pilih 1–3)</span>
+            Transport Problems <span style={{ color: "#DC2626" }}>*</span>
+            <span style={{ display: "block", fontWeight: 400, color: "#6B7280", marginTop: "0.125rem" }}>(Select 1–3)</span>
           </label>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.375rem" }}>
             {TRANSPORT_PROBLEMS.map((opt) => {
@@ -331,8 +331,8 @@ export default function InputForm({ onSubmit, isLoading, onLocationChange }: Inp
         {/* Additional context — always optional, max 300 chars */}
         <div style={fieldStyle}>
           <label htmlFor="additional-context" style={labelStyle}>
-            Konteks Tambahan / Additional Context
-            <span style={{ fontWeight: 400, color: "#6B7280", marginLeft: "0.25rem" }}>(pilihan / optional)</span>
+            Additional Context
+            <span style={{ fontWeight: 400, color: "#6B7280", marginLeft: "0.25rem" }}>(optional)</span>
           </label>
           <textarea id="additional-context" value={additionalContext}
             onChange={(e) => {
@@ -354,12 +354,12 @@ export default function InputForm({ onSubmit, isLoading, onLocationChange }: Inp
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "0.75rem" }}>
           <div style={fieldStyle}>
             <label htmlFor="time-period" style={labelStyle}>
-              Masa / Period <span style={{ color: "#DC2626" }}>*</span>
+              Period <span style={{ color: "#DC2626" }}>*</span>
             </label>
             <select id="time-period" value={timePeriod}
               onChange={(e) => { setTimePeriod(e.target.value as TimePeriod); setErrors((prev) => ({ ...prev, timePeriod: "" })); }}
               style={errors.timePeriod ? errorSelectStyle : selectStyle}>
-              <option value="">-- Pilih tempoh --</option>
+              <option value="">-- Select Time --</option>
               {TIME_PERIODS.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
             {errors.timePeriod && <p style={errorTextStyle}>{errors.timePeriod}</p>}
@@ -367,12 +367,12 @@ export default function InputForm({ onSubmit, isLoading, onLocationChange }: Inp
 
           <div style={fieldStyle}>
             <label htmlFor="day-type" style={labelStyle}>
-              Jenis Hari / Day Type <span style={{ color: "#DC2626" }}>*</span>
+              Day Type <span style={{ color: "#DC2626" }}>*</span>
             </label>
             <select id="day-type" value={dayType}
               onChange={(e) => { setDayType(e.target.value as DayType); setErrors((prev) => ({ ...prev, dayType: "" })); }}
               style={errors.dayType ? errorSelectStyle : selectStyle}>
-              <option value="">-- Pilih hari --</option>
+              <option value="">-- Select Day Type --</option>
               {DAY_TYPES.map((d) => <option key={d} value={d}>{d}</option>)}
             </select>
             {errors.dayType && <p style={errorTextStyle}>{errors.dayType}</p>}
@@ -382,17 +382,17 @@ export default function InputForm({ onSubmit, isLoading, onLocationChange }: Inp
 
       {/* ── STEP 3: BUDGET & POLICY ── */}
       <div style={sectionStyle}>
-        <p style={stepHeadingStyle}>Langkah 3 / Step 3 — Bajet & Dasar / Budget & Policy</p>
+        <p style={stepHeadingStyle}>Step 3 — Budget & Policy</p>
 
         {/* 5. Budget Range */}
         <div style={fieldStyle}>
           <label htmlFor="budget-range" style={labelStyle}>
-            Julat Bajet / Budget Range <span style={{ color: "#DC2626" }}>*</span>
+            Budget Range <span style={{ color: "#DC2626" }}>*</span>
           </label>
           <select id="budget-range" value={budgetRange}
             onChange={(e) => { setBudgetRange(e.target.value as BudgetRange); setErrors((prev) => ({ ...prev, budgetRange: "", exactBudget: "" })); }}
             style={errors.budgetRange ? errorSelectStyle : selectStyle}>
-            <option value="">-- Pilih julat / Select range --</option>
+            <option value="">-- Select range --</option>
             {BUDGET_RANGES.map((b) => <option key={b} value={b}>{b}</option>)}
           </select>
           {errors.budgetRange && <p style={errorTextStyle}>{errors.budgetRange}</p>}
@@ -401,11 +401,11 @@ export default function InputForm({ onSubmit, isLoading, onLocationChange }: Inp
         {/* Exact budget */}
         <div style={fieldStyle}>
           <label htmlFor="exact-budget" style={labelStyle}>
-            Bajet Tepat / Exact Budget
+            Exact Budget
             <span style={{ fontWeight: 400, color: "#6B7280", marginLeft: "0.25rem" }}>
-              {budgetRange === "Custom / Lain-lain"
+              {budgetRange === "Custom"
                 ? <span style={{ color: "#DC2626" }}> *</span>
-                : " (pilihan / optional — overrides range)"}
+                : " (optional — overrides range)"}
             </span>
           </label>
           <div style={{ display: "flex", alignItems: "stretch" }}>
@@ -427,9 +427,9 @@ export default function InputForm({ onSubmit, isLoading, onLocationChange }: Inp
               }} />
           </div>
           {errors.exactBudget && <p style={errorTextStyle}>{errors.exactBudget}</p>}
-          {exactBudget.trim() && !errors.exactBudget && budgetRange !== "Custom / Lain-lain" && (
+          {exactBudget.trim() && !errors.exactBudget && budgetRange !== "Custom" && (
             <p style={{ fontSize: "0.75rem", color: "#2563EB", marginTop: "0.25rem" }}>
-              ℹ Nilai tepat akan digunakan sebagai had / Exact value will be used as limit
+              ℹ Exact value will be used as limit
             </p>
           )}
         </div>
@@ -437,8 +437,8 @@ export default function InputForm({ onSubmit, isLoading, onLocationChange }: Inp
         {/* 6. Policy to Evaluate */}
         <div style={fieldStyle}>
           <label htmlFor="policy" style={labelStyle}>
-            Dasar untuk Dinilai / Policy to Evaluate
-            <span style={{ fontWeight: 400, color: "#6B7280", marginLeft: "0.25rem" }}>(pilihan / optional)</span>
+            Policy to Evaluate
+            <span style={{ fontWeight: 400, color: "#6B7280", marginLeft: "0.25rem" }}>(optional)</span>
           </label>
           <select id="policy" value={policyToEvaluate}
             onChange={(e) => setPolicyToEvaluate(e.target.value as PolicyOption)}
@@ -458,7 +458,7 @@ export default function InputForm({ onSubmit, isLoading, onLocationChange }: Inp
           cursor: isLoading ? "not-allowed" : "pointer",
           transition: "background-color 0.2s", letterSpacing: "0.02em",
         }}>
-        {isLoading ? "Menganalisis... / Analysing..." : "Jana Cadangan / Generate Recommendations"}
+        {isLoading ? "Analysing..." : "Generate Recommendations"}
       </button>
     </form>
   );

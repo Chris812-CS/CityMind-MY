@@ -233,7 +233,7 @@ function CostBreakdownTable({
   return (
     <div style={{ marginTop: "0.75rem" }}>
       <div style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "0.375rem" }}>
-        Cost Breakdown / Pecahan Kos
+        Cost Breakdown
       </div>
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "420px" }}>
@@ -320,13 +320,13 @@ function DetailPanel({
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem 2rem", marginBottom: "0.75rem" }}>
             <div>
               <div style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "0.25rem" }}>
-                Full Action / Tindakan Penuh
+                Full Action
               </div>
               <div style={{ fontSize: "0.875rem", color: "#111827", lineHeight: 1.5 }}>{rec.action}</div>
             </div>
             <div>
               <div style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "0.25rem" }}>
-                Rationale / Rasional
+                Rationale
               </div>
               <div style={{ fontSize: "0.875rem", color: "#4B5563", lineHeight: 1.5, fontStyle: "italic" }}>
                 {rec.rationale || "—"}
@@ -334,20 +334,20 @@ function DetailPanel({
             </div>
             <div>
               <div style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "0.25rem" }}>
-                Responsible Party / Pihak Bertanggungjawab
+                Responsible Party
               </div>
               <div style={{ fontSize: "0.875rem", color: "#111827" }}>{rec.responsible_party}</div>
             </div>
             <div>
               <div style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "0.25rem" }}>
-                Timeline / Tempoh
+                Timeline
               </div>
               <div style={{ fontSize: "0.875rem", color: "#111827" }}>{rec.estimated_timeline}</div>
             </div>
             {rec.expected_impact && (
               <div style={{ gridColumn: "1 / -1" }}>
                 <div style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "0.25rem" }}>
-                  Expected Impact / Impak Dijangka
+                  Expected Impact
                 </div>
                 <div style={{
                   fontSize: "0.875rem",
@@ -393,7 +393,7 @@ function DetailPanel({
                   cursor: "pointer",
                 }}
               >
-                ✏️ Edit / Sunting
+                ✏️ Edit
               </button>
             ) : (
               <>
@@ -411,7 +411,7 @@ function DetailPanel({
                     cursor: "pointer",
                   }}
                 >
-                  ✓ Save / Simpan
+                  ✓ Save
                 </button>
                 <button
                   type="button"
@@ -427,13 +427,13 @@ function DetailPanel({
                     cursor: "pointer",
                   }}
                 >
-                  ↺ Reset / Tetapkan Semula
+                  ↺ Reset
                 </button>
               </>
             )}
             {rec.isEdited && !isEditing && (
               <span style={{ fontSize: "0.75rem", color: "#D97706", fontStyle: "italic", alignSelf: "center" }}>
-                ⚠ Costs adjusted by officer / Kos disemak oleh pegawai
+                ⚠ Costs adjusted by officer
               </span>
             )}
           </div>
@@ -500,7 +500,6 @@ export default function RecommendationPanel({
         fontStyle: "italic",
         textAlign: "center",
       }}>
-        Tiada cadangan untuk dipaparkan. Sila hantar borang analisis.<br />
         No recommendations to display. Please submit the analysis form.
       </div>
     );

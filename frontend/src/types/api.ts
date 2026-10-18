@@ -39,7 +39,7 @@ export type BudgetRange =
   | "RM200k-500k"
   | "RM500k-1mil"
   | "Above RM1mil"
-  | "Custom / Lain-lain";
+  | "Custom";
 
 export type PolicyOption =
   | "Speed limit enforcement"

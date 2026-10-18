@@ -1,8 +1,13 @@
 import json
 import logging
+import os
+from dotenv import load_dotenv
 from strands import Agent
 from strands.models import BedrockModel
 from models import AnalyzeRequest, AnalysisResponse
+
+# Load environment variables from .env.local
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env.local"))
 
 logger = logging.getLogger(__name__)
 
@@ -10,6 +15,7 @@ bedrock_model = BedrockModel(
     model_id="arn:aws:bedrock:ap-southeast-2:110080809978:application-inference-profile/hj4ql7rcdm5c",
     region_name="ap-southeast-2",
     temperature=0.3,
+    api_key=os.environ.get("BEDROCK_API_KEY"),
 )
 
 SYSTEM_PROMPT = """
